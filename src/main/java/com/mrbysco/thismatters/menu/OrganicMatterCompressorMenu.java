@@ -85,7 +85,43 @@ public class OrganicMatterCompressorMenu extends AbstractContainerMenu {
 
 	@Override
 	public ItemStack quickMoveStack(Player player, int index) {
+		ItemStack itemstack = ItemStack.EMPTY;
+		Slot slot = this.slots.get(index);
+		if (slot != null && slot.hasItem()) {
+			ItemStack itemstack1 = slot.getItem();
+			itemstack = itemstack1.copy();
+			final int blockInventorySize = 11;
 
+			if(index < blockInventorySize) {
+				if (!this.moveItemStackTo(itemstack1, blockInventorySize, this.slots.size(), true)) {
+					return ItemStack.EMPTY;
+				}
+			} else {
+				if (this.canCompress(itemstack1)) {
+					if (!this.moveItemStackTo(itemstack1, 9, 10, false)) {
+						return ItemStack.EMPTY;
+					}
+				} else if (this.isMatter(itemstack1)) {
+					if (!this.moveItemStackTo(itemstack1, 0, 8, false)) {
+						return ItemStack.EMPTY;
+					}
+				}
+			}
+
+			if (itemstack1.isEmpty()) {
+				slot.set(ItemStack.EMPTY);
+			} else {
+				slot.setChanged();
+			}
+
+			if (itemstack1.getCount() == itemstack.getCount()) {
+				return ItemStack.EMPTY;
+			}
+
+			slot.onTake(player, itemstack1);
+		}
+
+		return itemstack;
 	}
 
 	protected boolean canCompress(ItemStack compress) {
