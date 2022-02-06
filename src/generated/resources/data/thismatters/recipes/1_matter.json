@@ -1,0 +1,12 @@
+{
+  "type": "thismatters:matter_recipe",
+  "ingredients": [
+    {
+      "tag": "forge:rods/wooden"
+    },
+    {
+      "tag": "minecraft:leaves"
+    }
+  ],
+  "matter": 1
+}

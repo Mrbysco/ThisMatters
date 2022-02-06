@@ -1,0 +1,138 @@
+{
+  "type": "thismatters:matter_recipe",
+  "ingredients": [
+    {
+      "item": "minecraft:wooden_sword"
+    },
+    {
+      "item": "minecraft:wooden_hoe"
+    },
+    {
+      "item": "minecraft:wooden_axe"
+    },
+    {
+      "item": "minecraft:wooden_pickaxe"
+    },
+    {
+      "item": "minecraft:wooden_shovel"
+    },
+    {
+      "tag": "forge:leather"
+    },
+    {
+      "item": "minecraft:leather_helmet"
+    },
+    {
+      "item": "minecraft:leather_chestplate"
+    },
+    {
+      "item": "minecraft:leather_leggings"
+    },
+    {
+      "item": "minecraft:leather_boots"
+    },
+    {
+      "tag": "minecraft:signs"
+    },
+    {
+      "item": "minecraft:saddle"
+    },
+    {
+      "tag": "minecraft:lectern_books"
+    },
+    {
+      "item": "minecraft:book"
+    },
+    {
+      "item": "minecraft:enchanted_book"
+    },
+    {
+      "item": "minecraft:fishing_rod"
+    },
+    {
+      "item": "minecraft:item_frame"
+    },
+    {
+      "item": "minecraft:glow_item_frame"
+    },
+    {
+      "tag": "minecraft:boats"
+    },
+    {
+      "tag": "forge:bones"
+    },
+    {
+      "tag": "minecraft:beds"
+    },
+    {
+      "item": "minecraft:filled_map"
+    },
+    {
+      "item": "minecraft:map"
+    },
+    {
+      "item": "minecraft:carrot_on_a_stick"
+    },
+    {
+      "item": "minecraft:warped_fungus_on_a_stick"
+    },
+    {
+      "item": "minecraft:name_tag"
+    },
+    {
+      "item": "minecraft:sugar"
+    },
+    {
+      "item": "minecraft:cake"
+    },
+    {
+      "tag": "forge:slimeballs"
+    },
+    {
+      "item": "minecraft:paper"
+    },
+    {
+      "tag": "minecraft:wooden_doors"
+    },
+    {
+      "tag": "minecraft:wooden_trapdoors"
+    },
+    {
+      "item": "minecraft:lead"
+    },
+    {
+      "tag": "forge:crops"
+    },
+    {
+      "tag": "forge:dyes"
+    },
+    {
+      "item": "minecraft:sugar_cane"
+    },
+    {
+      "tag": "forge:feathers"
+    },
+    {
+      "tag": "forge:eggs"
+    },
+    {
+      "tag": "minecraft:wooden_slabs"
+    },
+    {
+      "tag": "minecraft:wooden_stairs"
+    },
+    {
+      "tag": "minecraft:wooden_fences"
+    },
+    {
+      "tag": "minecraft:wooden_buttons"
+    },
+    {
+      "tag": "minecraft:wooden_pressure_plates"
+    },
+    {
+      "tag": "minecraft:saplings"
+    }
+  ],
+  "matter": 2
+}

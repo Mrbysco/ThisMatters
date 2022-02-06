@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "EOE",
+    "OCO",
+    "OIO"
+  ],
+  "key": {
+    "E": {
+      "tag": "forge:gems/emerald"
+    },
+    "O": {
+      "tag": "forge:obsidian"
+    },
+    "C": {
+      "item": "minecraft:cauldron"
+    },
+    "I": {
+      "tag": "forge:storage_blocks/iron"
+    }
+  },
+  "result": {
+    "item": "thismatters:organic_matter_compressor"
+  }
+}

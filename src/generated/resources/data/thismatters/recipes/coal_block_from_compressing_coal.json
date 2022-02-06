@@ -1,0 +1,8 @@
+{
+  "type": "thismatters:organic_matter_compression",
+  "ingredient": {
+    "item": "minecraft:coal"
+  },
+  "result": "minecraft:coal_block",
+  "compressingtime": 900
+}

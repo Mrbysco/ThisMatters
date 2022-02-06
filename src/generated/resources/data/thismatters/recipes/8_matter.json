@@ -1,0 +1,9 @@
+{
+  "type": "thismatters:matter_recipe",
+  "ingredients": [
+    {
+      "tag": "forge:heads"
+    }
+  ],
+  "matter": 8
+}

@@ -1,0 +1,21 @@
+modLoader="javafml"
+loaderVersion="[38,)"
+issueTrackerURL="https://github.com/Mrbysco/ThisMatters/issues"
+license="MIT"
+
+[[mods]]
+modId="thismatters"
+version="${file.jarVersion}"
+displayName="This Matters"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/this-matters"
+authors="Mrbysco"
+description='''
+Allows you to compress organic matter and other items into a single item.
+'''
+credits=""
+[[dependencies.thismatters]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.18,1.19)"
+ordering="NONE"
+side="BOTH"
