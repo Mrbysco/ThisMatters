@@ -12,7 +12,6 @@ authors="Mrbysco"
 description='''
 Allows you to compress organic matter and other items into a single item.
 '''
-credits=""
 [[dependencies.thismatters]]
 modId="minecraft"
 mandatory=true
