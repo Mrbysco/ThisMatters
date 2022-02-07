@@ -7,7 +7,7 @@ Allows you to compress organic matter and other items into a single item.
 
 ## License ##
 * This Matters is licensed under the MIT License
-  - (c) 2021 Mrbysco
+  - (c) 2022 Mrbysco
   - [![License](https://img.shields.io/badge/License-MIT-red.svg?style=flat)](http://opensource.org/licenses/MIT)
 
 ## Downloads ##
