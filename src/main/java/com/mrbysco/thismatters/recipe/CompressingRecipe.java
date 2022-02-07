@@ -36,7 +36,7 @@ public class CompressingRecipe implements Recipe<Container> {
 	}
 
 	public boolean matches(Container container, Level level) {
-		return this.ingredient.test(container.getItem(9));
+		return this.ingredient.test(container.getItem(0));
 	}
 
 	public ItemStack assemble(Container container) {

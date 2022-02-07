@@ -168,8 +168,9 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 			}
 		}
 
-		if (compressorBlockEntity.hasMatter() && !compressorBlockEntity.inputHandler.getStackInSlot(0).isEmpty()) {
-			Recipe<?> recipe = level.getRecipeManager().getRecipeFor((RecipeType<CompressingRecipe>)ThisRecipeTypes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE, compressorBlockEntity, level).orElse(null);
+		ItemStack inputStack = compressorBlockEntity.inputHandler.getStackInSlot(0);
+		if (compressorBlockEntity.hasMatter() && !inputStack.isEmpty()) {
+			Recipe<?> recipe = level.getRecipeManager().getRecipeFor((RecipeType<CompressingRecipe>)ThisRecipeTypes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE, new SimpleContainer(inputStack), level).orElse(null);
 			int i = compressorBlockEntity.getMaxStackSize();
 			if (compressorBlockEntity.hasMatter() && compressorBlockEntity.canCompress(recipe, i)) {
 				++compressorBlockEntity.compressingProgress;

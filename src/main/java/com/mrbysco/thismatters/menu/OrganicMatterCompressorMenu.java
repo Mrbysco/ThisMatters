@@ -1,7 +1,6 @@
 package com.mrbysco.thismatters.menu;
 
 import com.mrbysco.thismatters.blockentity.OrganicMatterCompressorBlockEntity;
-import com.mrbysco.thismatters.recipe.CompressingRecipe;
 import com.mrbysco.thismatters.registry.ThisMenus;
 import com.mrbysco.thismatters.registry.ThisRecipeTypes;
 import net.minecraft.network.FriendlyByteBuf;
@@ -13,7 +12,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.items.IItemHandler;
@@ -98,11 +96,11 @@ public class OrganicMatterCompressorMenu extends AbstractContainerMenu {
 				}
 			} else {
 				if (this.canCompress(itemstack1)) {
-					if (!this.moveItemStackTo(itemstack1, 9, 10, false)) {
+					if (!this.moveItemStackTo(itemstack1, 0, 1, false)) {
 						return ItemStack.EMPTY;
 					}
 				} else if (this.isMatter(itemstack1)) {
-					if (!this.moveItemStackTo(itemstack1, 0, 8, false)) {
+					if (!this.moveItemStackTo(itemstack1, 2, 11, false)) {
 						return ItemStack.EMPTY;
 					}
 				} else {
@@ -129,7 +127,7 @@ public class OrganicMatterCompressorMenu extends AbstractContainerMenu {
 	}
 
 	protected boolean canCompress(ItemStack compress) {
-		return this.level.getRecipeManager().getRecipeFor((RecipeType<CompressingRecipe>) ThisRecipeTypes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE, new SimpleContainer(compress), this.level).isPresent();
+		return level.getRecipeManager().getRecipeFor(ThisRecipeTypes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE, new SimpleContainer(compress), level).isPresent();
 	}
 
 	protected boolean isMatter(ItemStack stack) {
