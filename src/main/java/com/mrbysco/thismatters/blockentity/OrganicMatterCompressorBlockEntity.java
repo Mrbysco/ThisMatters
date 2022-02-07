@@ -94,7 +94,6 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 				case 2 -> OrganicMatterCompressorBlockEntity.this.compressingProgress = value;
 				case 3 -> OrganicMatterCompressorBlockEntity.this.compressingTotalTime = value;
 			}
-
 		}
 
 		public int getCount() {
