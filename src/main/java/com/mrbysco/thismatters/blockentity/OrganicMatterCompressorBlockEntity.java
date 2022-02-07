@@ -112,7 +112,6 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 
 	public OrganicMatterCompressorBlockEntity(BlockPos pos, BlockState state) {
 		super(ThisRegistry.ORGANIC_MATTER_COMPRESSOR_BE.get(), pos, state);
-		this.matterAmount = 0;
 		this.maxMatter = ThisConfig.COMMON.maxMatter.get();
 	}
 
@@ -159,6 +158,7 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 				if(matterValue > 0) {
 					for(int j = 0; j < itemstack.getCount(); ++j) {
 						if(compressorBlockEntity.increaseMatter(matterValue)) {
+							compressorBlockEntity.refreshClient();
 							itemstack.shrink(1);
 						} else {
 							break;
@@ -361,7 +361,6 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 			stack.setCount(this.getMaxStackSize());
 		}
 
-		System.out.println(slot);
 		if (slot == SLOT_INPUT && !flag) {
 			assert level != null;
 			this.compressingTotalTime = getTotalCompressingTime(level, new SimpleContainer(this.inputHandler.getStackInSlot(0)));
