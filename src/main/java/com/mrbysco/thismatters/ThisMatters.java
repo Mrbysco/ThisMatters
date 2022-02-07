@@ -40,14 +40,8 @@ public class ThisMatters {
         ThisRecipeTypes.RECIPE_SERIALIZERS.register(eventBus);
         ThisMenus.MENUS.register(eventBus);
 
-        eventBus.addListener(this::setup);
-
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             eventBus.addListener(ClientHandler::onClientSetup);
         });
-    }
-
-    private void setup(final FMLCommonSetupEvent event) {
-
     }
 }
