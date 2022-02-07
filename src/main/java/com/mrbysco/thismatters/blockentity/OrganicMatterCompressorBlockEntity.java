@@ -78,33 +78,21 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 
 	protected final ContainerData dataAccess = new ContainerData() {
 		public int get(int index) {
-			switch(index) {
-				case 0:
-					return OrganicMatterCompressorBlockEntity.this.matterAmount;
-				case 1:
-					return OrganicMatterCompressorBlockEntity.this.maxMatter;
-				case 2:
-					return OrganicMatterCompressorBlockEntity.this.compressingProgress;
-				case 3:
-					return OrganicMatterCompressorBlockEntity.this.compressingTotalTime;
-				default:
-					return 0;
-			}
+			return switch (index) {
+				case 0 -> OrganicMatterCompressorBlockEntity.this.matterAmount;
+				case 1 -> OrganicMatterCompressorBlockEntity.this.maxMatter;
+				case 2 -> OrganicMatterCompressorBlockEntity.this.compressingProgress;
+				case 3 -> OrganicMatterCompressorBlockEntity.this.compressingTotalTime;
+				default -> 0;
+			};
 		}
 
 		public void set(int index, int value) {
-			switch(index) {
-				case 0:
-					OrganicMatterCompressorBlockEntity.this.matterAmount = value;
-					break;
-				case 1:
-					OrganicMatterCompressorBlockEntity.this.maxMatter = value;
-					break;
-				case 2:
-					OrganicMatterCompressorBlockEntity.this.compressingProgress = value;
-					break;
-				case 3:
-					OrganicMatterCompressorBlockEntity.this.compressingTotalTime = value;
+			switch (index) {
+				case 0 -> OrganicMatterCompressorBlockEntity.this.matterAmount = value;
+				case 1 -> OrganicMatterCompressorBlockEntity.this.maxMatter = value;
+				case 2 -> OrganicMatterCompressorBlockEntity.this.compressingProgress = value;
+				case 3 -> OrganicMatterCompressorBlockEntity.this.compressingTotalTime = value;
 			}
 
 		}

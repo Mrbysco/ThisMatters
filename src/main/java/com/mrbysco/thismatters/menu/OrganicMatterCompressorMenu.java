@@ -105,6 +105,10 @@ public class OrganicMatterCompressorMenu extends AbstractContainerMenu {
 					if (!this.moveItemStackTo(itemstack1, 0, 8, false)) {
 						return ItemStack.EMPTY;
 					}
+				} else {
+					if (!this.moveItemStackTo(itemstack1, blockInventorySize, this.slots.size(), true)) {
+						return ItemStack.EMPTY;
+					}
 				}
 			}
 
