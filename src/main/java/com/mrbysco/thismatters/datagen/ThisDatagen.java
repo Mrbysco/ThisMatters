@@ -169,6 +169,9 @@ public class ThisDatagen {
 			addBlock(ThisRegistry.ORGANIC_MATTER_COMPRESSOR, "Organic Matter Compressor");
 
 			add("thismatters.organic_matter_compressor.not_low_enough", "Pressure too low, try placing the block deeper");
+
+			add("thismatters.gui.jei.category.organic_matter_compressing", "Organic Matter Compressor");
+			add("thismatters.gui.jei.compressing.matter", "<Matter>");
 		}
 	}
 
