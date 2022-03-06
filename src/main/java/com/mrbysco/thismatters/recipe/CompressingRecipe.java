@@ -2,6 +2,7 @@ package com.mrbysco.thismatters.recipe;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mrbysco.thismatters.registry.ThisRecipeSerializers;
 import com.mrbysco.thismatters.registry.ThisRecipeTypes;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Registry;
@@ -71,7 +72,7 @@ public class CompressingRecipe implements Recipe<Container> {
 
 	@Override
 	public RecipeSerializer<?> getSerializer() {
-		return ThisRecipeTypes.ORGANIC_MATTER_COMPRESSION_SERIALIZER.get();
+		return ThisRecipeSerializers.ORGANIC_MATTER_COMPRESSION_SERIALIZER.get();
 	}
 
 	public RecipeType<?> getType() {
@@ -87,12 +88,14 @@ public class CompressingRecipe implements Recipe<Container> {
 		@Override
 		public CompressingRecipe fromJson(ResourceLocation recipeId, JsonObject jsonObject) {
 			String s = GsonHelper.getAsString(jsonObject, "group", "");
-			JsonElement jsonelement = (JsonElement)(GsonHelper.isArrayNode(jsonObject, "ingredient") ? GsonHelper.getAsJsonArray(jsonObject, "ingredient") : GsonHelper.getAsJsonObject(jsonObject, "ingredient"));
+			JsonElement jsonelement = (JsonElement) (GsonHelper.isArrayNode(jsonObject, "ingredient") ? GsonHelper.getAsJsonArray(jsonObject, "ingredient") : GsonHelper.getAsJsonObject(jsonObject, "ingredient"));
 			Ingredient ingredient = Ingredient.fromJson(jsonelement);
 			//Forge: Check if primitive string to keep vanilla or a object which can contain a count field.
-			if (!jsonObject.has("result")) throw new com.google.gson.JsonSyntaxException("Missing result, expected to find a string or object");
+			if (!jsonObject.has("result"))
+				throw new com.google.gson.JsonSyntaxException("Missing result, expected to find a string or object");
 			ItemStack itemstack;
-			if (jsonObject.get("result").isJsonObject()) itemstack = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(jsonObject, "result"));
+			if (jsonObject.get("result").isJsonObject())
+				itemstack = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(jsonObject, "result"));
 			else {
 				String s1 = GsonHelper.getAsString(jsonObject, "result");
 				ResourceLocation resourcelocation = new ResourceLocation(s1);

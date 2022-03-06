@@ -3,10 +3,10 @@ package com.mrbysco.thismatters.datagen.builder;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.mrbysco.thismatters.registry.ThisRecipeTypes;
+import com.mrbysco.thismatters.registry.ThisRecipeSerializers;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -32,7 +32,7 @@ public class MatterRecipeBuilder implements MatterBuilder {
 		return new MatterRecipeBuilder(location, matterAmount);
 	}
 
-	public MatterRecipeBuilder requires(Tag<Item> itemTag) {
+	public MatterRecipeBuilder requires(TagKey<Item> itemTag) {
 		return this.requires(Ingredient.of(itemTag));
 	}
 
@@ -41,7 +41,7 @@ public class MatterRecipeBuilder implements MatterBuilder {
 	}
 
 	public MatterRecipeBuilder requires(ItemLike itemLike, int count) {
-		for(int i = 0; i < count; ++i) {
+		for (int i = 0; i < count; ++i) {
 			this.requires(Ingredient.of(itemLike));
 		}
 
@@ -53,7 +53,7 @@ public class MatterRecipeBuilder implements MatterBuilder {
 	}
 
 	public MatterRecipeBuilder requires(Ingredient ingredient, int count) {
-		for(int i = 0; i < count; ++i) {
+		for (int i = 0; i < count; ++i) {
 			this.ingredients.add(ingredient);
 		}
 
@@ -94,7 +94,7 @@ public class MatterRecipeBuilder implements MatterBuilder {
 
 			JsonArray jsonarray = new JsonArray();
 
-			for(Ingredient ingredient : this.ingredients) {
+			for (Ingredient ingredient : this.ingredients) {
 				jsonarray.add(ingredient.toJson());
 			}
 
@@ -103,7 +103,7 @@ public class MatterRecipeBuilder implements MatterBuilder {
 		}
 
 		public RecipeSerializer<?> getType() {
-			return ThisRecipeTypes.MATTER_SERIALIZER.get();
+			return ThisRecipeSerializers.MATTER_SERIALIZER.get();
 		}
 
 		public ResourceLocation getId() {

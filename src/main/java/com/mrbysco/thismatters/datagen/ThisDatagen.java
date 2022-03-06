@@ -70,6 +70,7 @@ public class ThisDatagen {
 			generator.addProvider(new BlockStates(generator, helper));
 		}
 	}
+
 	private static class Loots extends LootTableProvider {
 		public Loots(DataGenerator gen) {
 			super(gen);
@@ -172,6 +173,7 @@ public class ThisDatagen {
 
 			add("thismatters.gui.jei.category.organic_matter_compressing", "Organic Matter Compressor");
 			add("thismatters.gui.jei.compressing.matter", "<Matter>");
+			add("thismatters.gui.jei.compressing.matter_amount", "Produces %s Matter");
 		}
 	}
 

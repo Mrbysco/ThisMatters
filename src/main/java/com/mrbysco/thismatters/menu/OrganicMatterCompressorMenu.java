@@ -90,7 +90,7 @@ public class OrganicMatterCompressorMenu extends AbstractContainerMenu {
 			itemstack = itemstack1.copy();
 			final int blockInventorySize = 11;
 
-			if(index < blockInventorySize) {
+			if (index < blockInventorySize) {
 				if (!this.moveItemStackTo(itemstack1, blockInventorySize, this.slots.size(), true)) {
 					return ItemStack.EMPTY;
 				}

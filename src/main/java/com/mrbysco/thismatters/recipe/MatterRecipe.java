@@ -3,6 +3,7 @@ package com.mrbysco.thismatters.recipe;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.mrbysco.thismatters.registry.ThisRecipeSerializers;
 import com.mrbysco.thismatters.registry.ThisRecipeTypes;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
@@ -37,7 +38,7 @@ public class MatterRecipe implements Recipe<Container> {
 	public boolean matches(Container container, Level level) {
 		java.util.List<ItemStack> inputs = new java.util.ArrayList<>();
 
-		for(int j = 0; j < container.getContainerSize(); ++j) {
+		for (int j = 0; j < container.getContainerSize(); ++j) {
 			ItemStack itemstack = container.getItem(j);
 			if (!itemstack.isEmpty()) {
 				inputs.add(itemstack);
@@ -77,7 +78,7 @@ public class MatterRecipe implements Recipe<Container> {
 
 	@Override
 	public RecipeSerializer<?> getSerializer() {
-		return ThisRecipeTypes.MATTER_SERIALIZER.get();
+		return ThisRecipeSerializers.MATTER_SERIALIZER.get();
 	}
 
 	public RecipeType<?> getType() {
@@ -105,7 +106,7 @@ public class MatterRecipe implements Recipe<Container> {
 		private static NonNullList<Ingredient> itemsFromJson(JsonArray jsonArray) {
 			NonNullList<Ingredient> nonnulllist = NonNullList.create();
 
-			for(int i = 0; i < jsonArray.size(); ++i) {
+			for (int i = 0; i < jsonArray.size(); ++i) {
 				Ingredient ingredient = Ingredient.fromJson(jsonArray.get(i));
 				if (!ingredient.isEmpty()) {
 					nonnulllist.add(ingredient);
@@ -122,7 +123,7 @@ public class MatterRecipe implements Recipe<Container> {
 			int i = buffer.readVarInt();
 			NonNullList<Ingredient> nonnulllist = NonNullList.withSize(i, Ingredient.EMPTY);
 
-			for(int j = 0; j < nonnulllist.size(); ++j) {
+			for (int j = 0; j < nonnulllist.size(); ++j) {
 				nonnulllist.set(j, Ingredient.fromNetwork(buffer));
 			}
 
@@ -135,7 +136,7 @@ public class MatterRecipe implements Recipe<Container> {
 			buffer.writeUtf(recipe.group);
 			buffer.writeVarInt(recipe.ingredients.size());
 
-			for(Ingredient ingredient : recipe.ingredients) {
+			for (Ingredient ingredient : recipe.ingredients) {
 				ingredient.toNetwork(buffer);
 			}
 

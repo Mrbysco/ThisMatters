@@ -50,7 +50,7 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 	public final ItemStackHandler matterHandler = new ItemStackHandler(9) {
 		@Override
 		public boolean isItemValid(int slot, @NotNull ItemStack stack) {
-			return level.getRecipeManager().getRecipeFor((RecipeType<MatterRecipe>)ThisRecipeTypes.MATTER_RECIPE_TYPE, new SimpleContainer(stack), level) != null;
+			return level.getRecipeManager().getRecipeFor((RecipeType<MatterRecipe>) ThisRecipeTypes.MATTER_RECIPE_TYPE, new SimpleContainer(stack), level) != null;
 		}
 	};
 	private LazyOptional<IItemHandler> matterHolder = LazyOptional.of(() -> matterHandler);
@@ -127,7 +127,7 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 		this.compressingTotalTime = tag.getInt("CompressingTotalTime");
 		CompoundTag compoundtag = tag.getCompound("RecipesUsed");
 
-		for(String s : compoundtag.getAllKeys()) {
+		for (String s : compoundtag.getAllKeys()) {
 			this.recipesUsed.put(new ResourceLocation(s), compoundtag.getInt(s));
 		}
 	}
@@ -151,13 +151,13 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 	}
 
 	public static void serverTick(Level level, BlockPos pos, BlockState state, OrganicMatterCompressorBlockEntity compressorBlockEntity) {
-		for(int i = 0; i < compressorBlockEntity.matterHandler.getSlots(); ++i) {
+		for (int i = 0; i < compressorBlockEntity.matterHandler.getSlots(); ++i) {
 			ItemStack itemstack = compressorBlockEntity.matterHandler.getStackInSlot(i);
-			if(!itemstack.isEmpty()) {
+			if (!itemstack.isEmpty()) {
 				int matterValue = getMatterValue(level, itemstack);
-				if(matterValue > 0) {
-					for(int j = 0; j < itemstack.getCount(); ++j) {
-						if(compressorBlockEntity.increaseMatter(matterValue)) {
+				if (matterValue > 0) {
+					for (int j = 0; j < itemstack.getCount(); ++j) {
+						if (compressorBlockEntity.increaseMatter(matterValue)) {
 							compressorBlockEntity.refreshClient();
 							itemstack.shrink(1);
 						} else {
@@ -170,7 +170,7 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 
 		ItemStack inputStack = compressorBlockEntity.inputHandler.getStackInSlot(0);
 		if (compressorBlockEntity.hasMatter() && !inputStack.isEmpty()) {
-			Recipe<?> recipe = level.getRecipeManager().getRecipeFor((RecipeType<CompressingRecipe>)ThisRecipeTypes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE, new SimpleContainer(inputStack), level).orElse(null);
+			Recipe<?> recipe = level.getRecipeManager().getRecipeFor((RecipeType<CompressingRecipe>) ThisRecipeTypes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE, new SimpleContainer(inputStack), level).orElse(null);
 			int i = compressorBlockEntity.getMaxStackSize();
 			if (compressorBlockEntity.hasMatter() && compressorBlockEntity.canCompress(recipe, i)) {
 				++compressorBlockEntity.compressingProgress;
@@ -245,7 +245,7 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 
 	protected boolean increaseMatter(int matter) {
 		int newValue = matterAmount + matter;
-		if(newValue <= maxMatter) {
+		if (newValue <= maxMatter) {
 			this.matterAmount = newValue;
 			return true;
 		} else {
@@ -287,17 +287,17 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 
 	@Override
 	public boolean isEmpty() {
-		for(int i = 0; i < matterHandler.getSlots(); i++) {
+		for (int i = 0; i < matterHandler.getSlots(); i++) {
 			if (!matterHandler.getStackInSlot(i).isEmpty()) {
 				return false;
 			}
 		}
-		for(int i = 0; i < inputHandler.getSlots(); i++) {
+		for (int i = 0; i < inputHandler.getSlots(); i++) {
 			if (!inputHandler.getStackInSlot(i).isEmpty()) {
 				return false;
 			}
 		}
-		for(int i = 0; i < resultHandler.getSlots(); i++) {
+		for (int i = 0; i < resultHandler.getSlots(); i++) {
 			if (!resultHandler.getStackInSlot(i).isEmpty()) {
 				return false;
 			}
@@ -307,9 +307,9 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 
 	@Override
 	public ItemStack getItem(int slot) {
-		if(slot == SLOT_INPUT) {
+		if (slot == SLOT_INPUT) {
 			return inputHandler.getStackInSlot(0);
-		} else if(slot == SLOT_RESULT) {
+		} else if (slot == SLOT_RESULT) {
 			return resultHandler.getStackInSlot(0);
 		} else {
 			return matterHandler.getStackInSlot(slot);
@@ -318,9 +318,9 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 
 	@Override
 	public ItemStack removeItem(int slot, int count) {
-		if(slot == SLOT_INPUT) {
+		if (slot == SLOT_INPUT) {
 			return CapabilityHelper.removeItem(inputHandler, 0, count);
-		} else if(slot == SLOT_RESULT) {
+		} else if (slot == SLOT_RESULT) {
 			return CapabilityHelper.removeItem(resultHandler, 0, count);
 		} else {
 			return CapabilityHelper.removeItem(matterHandler, slot, count);
@@ -329,9 +329,9 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 
 	@Override
 	public ItemStack removeItemNoUpdate(int slot) {
-		if(slot == SLOT_INPUT) {
+		if (slot == SLOT_INPUT) {
 			return CapabilityHelper.takeItem(inputHandler, 0);
-		} else if(slot == SLOT_RESULT) {
+		} else if (slot == SLOT_RESULT) {
 			return CapabilityHelper.takeItem(resultHandler, 0);
 		} else {
 			return CapabilityHelper.takeItem(matterHandler, slot);
@@ -341,18 +341,18 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 	@Override
 	public void setItem(int slot, ItemStack stack) {
 		ItemStack itemstack;
-		if(slot == SLOT_INPUT) {
+		if (slot == SLOT_INPUT) {
 			itemstack = inputHandler.getStackInSlot(0);
-		} else if(slot == SLOT_RESULT) {
+		} else if (slot == SLOT_RESULT) {
 			itemstack = resultHandler.getStackInSlot(0);
 		} else {
 			itemstack = matterHandler.getStackInSlot(slot);
 		}
 
 		boolean flag = !stack.isEmpty() && stack.sameItem(itemstack) && ItemStack.tagMatches(stack, itemstack);
-		if(slot == SLOT_INPUT) {
+		if (slot == SLOT_INPUT) {
 			inputHandler.setStackInSlot(0, stack);
-		} else if(slot == SLOT_RESULT) {
+		} else if (slot == SLOT_RESULT) {
 			resultHandler.setStackInSlot(0, stack);
 		} else {
 			matterHandler.setStackInSlot(slot, stack);
@@ -370,28 +370,28 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 	}
 
 	public static int getMatterValue(Level level, ItemStack stack) {
-		return level.getRecipeManager().getRecipeFor((RecipeType<MatterRecipe>)ThisRecipeTypes.MATTER_RECIPE_TYPE, new SimpleContainer(stack), level).map(MatterRecipe::getMatterAmount).orElse(getDefaultMatterValue(stack));
+		return level.getRecipeManager().getRecipeFor((RecipeType<MatterRecipe>) ThisRecipeTypes.MATTER_RECIPE_TYPE, new SimpleContainer(stack), level).map(MatterRecipe::getMatterAmount).orElse(getDefaultMatterValue(stack));
 	}
 
 	private static int getDefaultMatterValue(ItemStack stack) {
 		int itemID = Item.getId(stack.getItem());
-		if(cachedDefaults.containsKey(itemID)) {
+		if (cachedDefaults.containsKey(itemID)) {
 			return cachedDefaults.get(itemID);
 		}
 
 		int defaultValue = 0;
-		if(stack.getItem() instanceof BlockItem blockItem) {
+		if (stack.getItem() instanceof BlockItem blockItem) {
 			Material material = blockItem.getBlock().defaultBlockState().getMaterial();
 			if (material == Material.NETHER_WOOD) {
 				defaultValue = 5;
-			} else if(material == Material.CACTUS || material == Material.GRASS || material == Material.WOOD ||
+			} else if (material == Material.CACTUS || material == Material.GRASS || material == Material.WOOD ||
 					material == Material.VEGETABLE) {
 				defaultValue = 4;
-			} else if(material == Material.LEAVES || material == Material.PLANT || material == Material.REPLACEABLE_PLANT ||
+			} else if (material == Material.LEAVES || material == Material.PLANT || material == Material.REPLACEABLE_PLANT ||
 					material == Material.REPLACEABLE_WATER_PLANT || material == Material.REPLACEABLE_FIREPROOF_PLANT ||
 					material == Material.WEB || material == Material.WOOL || material == Material.CAKE) {
 				defaultValue = 3;
-			} else if(material == Material.CLOTH_DECORATION) {
+			} else if (material == Material.CLOTH_DECORATION) {
 				defaultValue = 2;
 			}
 		}
@@ -410,20 +410,20 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 		} else {
 			int minY = Mth.clamp(ThisConfig.COMMON.minY.get(), level.getMinBuildHeight(), level.getMaxBuildHeight());
 			return this.worldPosition.getY() <= minY &&
-					player.distanceToSqr((double)this.worldPosition.getX() + 0.5D, (double)this.worldPosition.getY() + 0.5D, (double)this.worldPosition.getZ() + 0.5D) <= 64.0D;
+					player.distanceToSqr((double) this.worldPosition.getX() + 0.5D, (double) this.worldPosition.getY() + 0.5D, (double) this.worldPosition.getZ() + 0.5D) <= 64.0D;
 
 		}
 	}
 
 	@Override
 	public void clearContent() {
-		for(int i = 0; i < matterHandler.getSlots(); i++) {
+		for (int i = 0; i < matterHandler.getSlots(); i++) {
 			matterHandler.setStackInSlot(i, ItemStack.EMPTY);
 		}
-		for(int i = 0; i < inputHandler.getSlots(); i++) {
+		for (int i = 0; i < inputHandler.getSlots(); i++) {
 			inputHandler.setStackInSlot(i, ItemStack.EMPTY);
 		}
-		for(int i = 0; i < resultHandler.getSlots(); i++) {
+		for (int i = 0; i < resultHandler.getSlots(); i++) {
 			resultHandler.setStackInSlot(i, ItemStack.EMPTY);
 		}
 	}
@@ -475,10 +475,10 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-		if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-			if(side == Direction.UP) {
+		if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+			if (side == Direction.UP) {
 				return inputHolder.cast();
-			} else if(side == Direction.DOWN) {
+			} else if (side == Direction.DOWN) {
 				return resultHolder.cast();
 			} else {
 				return matterHolder.cast();

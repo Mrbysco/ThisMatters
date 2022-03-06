@@ -1,7 +1,7 @@
 package com.mrbysco.thismatters.datagen.builder;
 
 import com.google.gson.JsonObject;
-import com.mrbysco.thismatters.registry.ThisRecipeTypes;
+import com.mrbysco.thismatters.registry.ThisRecipeSerializers;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.CriterionTriggerInstance;
@@ -95,7 +95,7 @@ public class CompressingRecipeBuilder implements RecipeBuilder {
 		}
 
 		public RecipeSerializer<?> getType() {
-			return ThisRecipeTypes.ORGANIC_MATTER_COMPRESSION_SERIALIZER.get();
+			return ThisRecipeSerializers.ORGANIC_MATTER_COMPRESSION_SERIALIZER.get();
 		}
 
 		public ResourceLocation getId() {

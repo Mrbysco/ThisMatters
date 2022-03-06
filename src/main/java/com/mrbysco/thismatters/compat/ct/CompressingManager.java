@@ -1,6 +1,6 @@
 package com.mrbysco.thismatters.compat.ct;
 
-import com.blamejared.crafttweaker.api.CraftTweakerAPI;
+/*import com.blamejared.crafttweaker.api.CraftTweakerAPI;
 import com.blamejared.crafttweaker.api.action.recipe.ActionAddRecipe;
 import com.blamejared.crafttweaker.api.annotation.ZenRegister;
 import com.blamejared.crafttweaker.api.ingredient.IIngredient;
@@ -14,13 +14,13 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.openzen.zencode.java.ZenCodeGlobals.Global;
 import org.openzen.zencode.java.ZenCodeType.Method;
-import org.openzen.zencode.java.ZenCodeType.Name;
+import org.openzen.zencode.java.ZenCodeType.Name;*/
 
-@ZenRegister
-@Name("mods.thismatters.CompressingManager")
-public class CompressingManager implements IRecipeManager<CompressingRecipe> {
+/*@ZenRegister
+@Name("mods.thismatters.CompressingManager")*/
+public class CompressingManager /*implements IRecipeManager<CompressingRecipe>*/ {
 
-	@Global("compressing")
+/*	@Global("compressing")
 	public static final CompressingManager INSTANCE = new CompressingManager();
 
 	private CompressingManager() {}
@@ -37,5 +37,5 @@ public class CompressingManager implements IRecipeManager<CompressingRecipe> {
 	@Override
 	public RecipeType<CompressingRecipe> getRecipeType() {
 		return ThisRecipeTypes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE;
-	}
+	}*/
 }
