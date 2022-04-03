@@ -3,8 +3,7 @@ package com.mrbysco.thismatters.recipe;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.mrbysco.thismatters.registry.ThisRecipeSerializers;
-import com.mrbysco.thismatters.registry.ThisRecipeTypes;
+import com.mrbysco.thismatters.registry.ThisRecipes;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -78,11 +77,11 @@ public class MatterRecipe implements Recipe<Container> {
 
 	@Override
 	public RecipeSerializer<?> getSerializer() {
-		return ThisRecipeSerializers.MATTER_SERIALIZER.get();
+		return ThisRecipes.MATTER_SERIALIZER.get();
 	}
 
 	public RecipeType<?> getType() {
-		return ThisRecipeTypes.MATTER_RECIPE_TYPE;
+		return ThisRecipes.MATTER_RECIPE_TYPE.get();
 	}
 
 	@Override

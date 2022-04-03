@@ -2,8 +2,7 @@ package com.mrbysco.thismatters.recipe;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mrbysco.thismatters.registry.ThisRecipeSerializers;
-import com.mrbysco.thismatters.registry.ThisRecipeTypes;
+import com.mrbysco.thismatters.registry.ThisRecipes;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
@@ -72,11 +71,11 @@ public class CompressingRecipe implements Recipe<Container> {
 
 	@Override
 	public RecipeSerializer<?> getSerializer() {
-		return ThisRecipeSerializers.ORGANIC_MATTER_COMPRESSION_SERIALIZER.get();
+		return ThisRecipes.ORGANIC_MATTER_COMPRESSION_SERIALIZER.get();
 	}
 
 	public RecipeType<?> getType() {
-		return ThisRecipeTypes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE;
+		return ThisRecipes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE.get();
 	}
 
 	@Override

@@ -1,29 +1,30 @@
 package com.mrbysco.thismatters.compat.ct;
 
-/*import com.blamejared.crafttweaker.api.CraftTweakerAPI;
+import com.blamejared.crafttweaker.api.CraftTweakerAPI;
 import com.blamejared.crafttweaker.api.action.recipe.ActionAddRecipe;
 import com.blamejared.crafttweaker.api.annotation.ZenRegister;
 import com.blamejared.crafttweaker.api.ingredient.IIngredient;
 import com.blamejared.crafttweaker.api.item.IItemStack;
 import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.mrbysco.thismatters.recipe.CompressingRecipe;
-import com.mrbysco.thismatters.registry.ThisRecipeTypes;
+import com.mrbysco.thismatters.registry.ThisRecipes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.openzen.zencode.java.ZenCodeGlobals.Global;
 import org.openzen.zencode.java.ZenCodeType.Method;
-import org.openzen.zencode.java.ZenCodeType.Name;*/
+import org.openzen.zencode.java.ZenCodeType.Name;
 
-/*@ZenRegister
-@Name("mods.thismatters.CompressingManager")*/
-public class CompressingManager /*implements IRecipeManager<CompressingRecipe>*/ {
+@ZenRegister
+@Name("mods.thismatters.CompressingManager")
+public class CompressingManager implements IRecipeManager<CompressingRecipe> {
 
-/*	@Global("compressing")
+	@Global("compressing")
 	public static final CompressingManager INSTANCE = new CompressingManager();
 
-	private CompressingManager() {}
+	private CompressingManager() {
+	}
 
 	@Method
 	public void addCompressing(String name, IIngredient ingredient, IItemStack resultStack, int time) {
@@ -36,6 +37,6 @@ public class CompressingManager /*implements IRecipeManager<CompressingRecipe>*/
 
 	@Override
 	public RecipeType<CompressingRecipe> getRecipeType() {
-		return ThisRecipeTypes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE;
-	}*/
+		return ThisRecipes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE.get();
+	}
 }

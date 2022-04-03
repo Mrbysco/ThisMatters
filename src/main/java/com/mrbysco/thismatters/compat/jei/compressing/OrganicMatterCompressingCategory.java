@@ -16,6 +16,7 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -43,6 +44,11 @@ public class OrganicMatterCompressingCategory implements IRecipeCategory<Compres
 
 		this.slotDrawable = guiHelper.getSlotDrawable();
 		MatterUtil.reloadMatterList(Minecraft.getInstance().level);
+	}
+
+	@Override
+	public RecipeType<CompressingRecipe> getRecipeType() {
+		return JeiCompat.ORGANIC_MATTER_COMPRESSING_TYPE;
 	}
 
 	@Override
@@ -74,10 +80,10 @@ public class OrganicMatterCompressingCategory implements IRecipeCategory<Compres
 	public void setRecipe(IRecipeLayoutBuilder builder, CompressingRecipe recipe, IFocusGroup focuses) {
 		builder.addSlot(RecipeIngredientRole.INPUT, 95, 2).addIngredients(recipe.getIngredients().get(0));
 
-		for(int i = 0; i < 3; ++i) {
-			for(int j = 0; j < 3; ++j) {
+		for (int i = 0; i < 3; ++i) {
+			for (int j = 0; j < 3; ++j) {
 				int index = j + i * 3;
-				if(index < MatterUtil.matterList.size()) {
+				if (index < MatterUtil.matterList.size()) {
 					MatterInfo matterInfo = MatterUtil.matterList.get(index);
 					builder.addSlot(RecipeIngredientRole.INPUT, 3 + j * 18, 3 + i * 18)
 							.addIngredients(VanillaTypes.ITEM, matterInfo.matterStacks()).addTooltipCallback(new MatterTooltip(matterInfo.matterAmount()));
@@ -88,38 +94,16 @@ public class OrganicMatterCompressingCategory implements IRecipeCategory<Compres
 		builder.addSlot(RecipeIngredientRole.OUTPUT, 95, 38).addItemStack(recipe.getResultItem());
 	}
 
-//	@Override
-//	public void setIngredients(CompressingRecipe recipe, IIngredients ingredients) {
-//		ingredients.setInputIngredients(recipe.getIngredients());
-//
-//		ingredients.setInputIngredients(ingredientList);
-//
-//		ingredients.setOutput(VanillaTypes.ITEM, recipe.getResultItem());
-//	}
-//
-//	@Override
-//	public void setRecipe(IRecipeLayout recipeLayout, CompressingRecipe recipe, IIngredients ingredients) {
-//		IGuiItemStackGroup guiItemStacks = recipeLayout.getItemStacks();
-//
-//		guiItemStacks.init(0, true, 94, 1);
-//		guiItemStacks.init(1, false, 94, 37);
-//
-//		guiItemStacks.set(ingredients);
-//	}
-
-
 	@Override
 	public void draw(CompressingRecipe recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
 		Font font = Minecraft.getInstance().font;
 		TextComponent component = new TextComponent((int) (recipe.getCompressingTime() / 20f) + "s");
 		font.draw(stack, component, 76 - font.width(component) / 2, 50, 16777215);
-
-//		TranslatableComponent matterComponent = new TranslatableComponent("thismatters.gui.jei.compressing.matter");
-//		font.draw(stack, matterComponent, 18 - font.width(component) / 2, 24, 0xAAAAAA);
 	}
 
 	public static class MatterTooltip implements IRecipeSlotTooltipCallback {
 		private final int matterAmount;
+
 		public MatterTooltip(int matterAmount) {
 			this.matterAmount = matterAmount;
 		}

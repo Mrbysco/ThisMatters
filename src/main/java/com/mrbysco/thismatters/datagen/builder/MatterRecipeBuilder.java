@@ -3,7 +3,7 @@ package com.mrbysco.thismatters.datagen.builder;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.mrbysco.thismatters.registry.ThisRecipeSerializers;
+import com.mrbysco.thismatters.registry.ThisRecipes;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -103,7 +103,7 @@ public class MatterRecipeBuilder implements MatterBuilder {
 		}
 
 		public RecipeSerializer<?> getType() {
-			return ThisRecipeSerializers.MATTER_SERIALIZER.get();
+			return ThisRecipes.MATTER_SERIALIZER.get();
 		}
 
 		public ResourceLocation getId() {

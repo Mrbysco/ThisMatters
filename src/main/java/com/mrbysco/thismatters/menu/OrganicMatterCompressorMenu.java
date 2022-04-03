@@ -2,7 +2,7 @@ package com.mrbysco.thismatters.menu;
 
 import com.mrbysco.thismatters.blockentity.OrganicMatterCompressorBlockEntity;
 import com.mrbysco.thismatters.registry.ThisMenus;
-import com.mrbysco.thismatters.registry.ThisRecipeTypes;
+import com.mrbysco.thismatters.registry.ThisRecipes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.SimpleContainer;
@@ -127,7 +127,7 @@ public class OrganicMatterCompressorMenu extends AbstractContainerMenu {
 	}
 
 	protected boolean canCompress(ItemStack compress) {
-		return level.getRecipeManager().getRecipeFor(ThisRecipeTypes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE, new SimpleContainer(compress), level).isPresent();
+		return level.getRecipeManager().getRecipeFor(ThisRecipes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE.get(), new SimpleContainer(compress), level).isPresent();
 	}
 
 	protected boolean isMatter(ItemStack stack) {

@@ -5,7 +5,7 @@ import com.mrbysco.thismatters.config.ThisConfig;
 import com.mrbysco.thismatters.menu.OrganicMatterCompressorMenu;
 import com.mrbysco.thismatters.recipe.CompressingRecipe;
 import com.mrbysco.thismatters.recipe.MatterRecipe;
-import com.mrbysco.thismatters.registry.ThisRecipeTypes;
+import com.mrbysco.thismatters.registry.ThisRecipes;
 import com.mrbysco.thismatters.registry.ThisRegistry;
 import com.mrbysco.thismatters.util.CapabilityHelper;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -50,7 +50,7 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 	public final ItemStackHandler matterHandler = new ItemStackHandler(9) {
 		@Override
 		public boolean isItemValid(int slot, @NotNull ItemStack stack) {
-			return level.getRecipeManager().getRecipeFor((RecipeType<MatterRecipe>) ThisRecipeTypes.MATTER_RECIPE_TYPE, new SimpleContainer(stack), level) != null;
+			return level.getRecipeManager().getRecipeFor((RecipeType<MatterRecipe>) ThisRecipes.MATTER_RECIPE_TYPE.get(), new SimpleContainer(stack), level) != null;
 		}
 	};
 	private LazyOptional<IItemHandler> matterHolder = LazyOptional.of(() -> matterHandler);
@@ -170,7 +170,7 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 
 		ItemStack inputStack = compressorBlockEntity.inputHandler.getStackInSlot(0);
 		if (compressorBlockEntity.hasMatter() && !inputStack.isEmpty()) {
-			Recipe<?> recipe = level.getRecipeManager().getRecipeFor((RecipeType<CompressingRecipe>) ThisRecipeTypes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE, new SimpleContainer(inputStack), level).orElse(null);
+			Recipe<?> recipe = level.getRecipeManager().getRecipeFor((RecipeType<CompressingRecipe>) ThisRecipes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE.get(), new SimpleContainer(inputStack), level).orElse(null);
 			int i = compressorBlockEntity.getMaxStackSize();
 			if (compressorBlockEntity.hasMatter() && compressorBlockEntity.canCompress(recipe, i)) {
 				++compressorBlockEntity.compressingProgress;
@@ -370,7 +370,7 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 	}
 
 	public static int getMatterValue(Level level, ItemStack stack) {
-		return level.getRecipeManager().getRecipeFor((RecipeType<MatterRecipe>) ThisRecipeTypes.MATTER_RECIPE_TYPE, new SimpleContainer(stack), level).map(MatterRecipe::getMatterAmount).orElse(getDefaultMatterValue(stack));
+		return level.getRecipeManager().getRecipeFor((RecipeType<MatterRecipe>) ThisRecipes.MATTER_RECIPE_TYPE.get(), new SimpleContainer(stack), level).map(MatterRecipe::getMatterAmount).orElse(getDefaultMatterValue(stack));
 	}
 
 	private static int getDefaultMatterValue(ItemStack stack) {
@@ -400,7 +400,7 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 	}
 
 	private static int getTotalCompressingTime(Level level, Container container) {
-		return level.getRecipeManager().getRecipeFor(ThisRecipeTypes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE, container, level).map(CompressingRecipe::getCompressingTime).orElse(900);
+		return level.getRecipeManager().getRecipeFor(ThisRecipes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE.get(), container, level).map(CompressingRecipe::getCompressingTime).orElse(900);
 	}
 
 	@Override

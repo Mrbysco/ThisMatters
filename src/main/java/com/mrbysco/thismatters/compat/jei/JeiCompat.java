@@ -3,12 +3,13 @@ package com.mrbysco.thismatters.compat.jei;
 import com.mrbysco.thismatters.ThisMatters;
 import com.mrbysco.thismatters.compat.jei.compressing.OrganicMatterCompressingCategory;
 import com.mrbysco.thismatters.recipe.CompressingRecipe;
-import com.mrbysco.thismatters.registry.ThisRecipeTypes;
+import com.mrbysco.thismatters.registry.ThisRecipes;
 import com.mrbysco.thismatters.registry.ThisRegistry;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.helpers.IJeiHelpers;
+import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
@@ -27,6 +28,7 @@ public class JeiCompat implements IModPlugin {
 	public static final ResourceLocation PLUGIN_UID = new ResourceLocation(ThisMatters.MOD_ID, "main");
 
 	public static final ResourceLocation ORGANIC_MATTER_COMPRESSING = new ResourceLocation(ThisMatters.MOD_ID, "organic_matter_compressing");
+	public static final RecipeType<CompressingRecipe> ORGANIC_MATTER_COMPRESSING_TYPE = RecipeType.create(ThisMatters.MOD_ID, "organic_matter_compressing", CompressingRecipe.class);
 
 	@Nullable
 	private IRecipeCategory<CompressingRecipe> compressingCategory;
@@ -38,7 +40,7 @@ public class JeiCompat implements IModPlugin {
 
 	@Override
 	public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-		registration.addRecipeCatalyst(new ItemStack(ThisRegistry.ORGANIC_MATTER_COMPRESSOR.get()), ORGANIC_MATTER_COMPRESSING);
+		registration.addRecipeCatalyst(new ItemStack(ThisRegistry.ORGANIC_MATTER_COMPRESSOR.get()), ORGANIC_MATTER_COMPRESSING_TYPE);
 	}
 
 	@Override
@@ -52,9 +54,9 @@ public class JeiCompat implements IModPlugin {
 
 	@Override
 	public void registerRecipes(IRecipeRegistration registration) {
-		ErrorUtil.checkNotNull(compressingCategory, "compressingCategory");
+		ErrorUtil.checkNotNull(ORGANIC_MATTER_COMPRESSING_TYPE, "organicMatterCompressingType");
 
 		ClientLevel world = Objects.requireNonNull(Minecraft.getInstance().level);
-		registration.addRecipes(world.getRecipeManager().getAllRecipesFor(ThisRecipeTypes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE), ORGANIC_MATTER_COMPRESSING);
+		registration.addRecipes(ORGANIC_MATTER_COMPRESSING_TYPE, world.getRecipeManager().getAllRecipesFor(ThisRecipes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE.get()));
 	}
 }
