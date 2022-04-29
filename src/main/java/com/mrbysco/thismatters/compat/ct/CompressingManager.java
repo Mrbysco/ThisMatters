@@ -12,7 +12,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
-import org.openzen.zencode.java.ZenCodeGlobals.Global;
 import org.openzen.zencode.java.ZenCodeType.Method;
 import org.openzen.zencode.java.ZenCodeType.Name;
 
@@ -20,7 +19,6 @@ import org.openzen.zencode.java.ZenCodeType.Name;
 @Name("mods.thismatters.CompressingManager")
 public class CompressingManager implements IRecipeManager<CompressingRecipe> {
 
-	@Global("compressing")
 	public static final CompressingManager INSTANCE = new CompressingManager();
 
 	private CompressingManager() {

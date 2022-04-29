@@ -51,11 +51,13 @@ public class OrganicMatterCompressingCategory implements IRecipeCategory<Compres
 		return JeiCompat.ORGANIC_MATTER_COMPRESSING_TYPE;
 	}
 
+	@SuppressWarnings("removal")
 	@Override
 	public ResourceLocation getUid() {
 		return JeiCompat.ORGANIC_MATTER_COMPRESSING;
 	}
 
+	@SuppressWarnings("removal")
 	@Override
 	public Class<? extends CompressingRecipe> getRecipeClass() {
 		return CompressingRecipe.class;
