@@ -46,6 +46,6 @@ public class OrganicMatterCompressorScreen extends AbstractContainerScreen<Organ
 			this.blit(poseStack, i + 94, j + 36, 176, 0, l + 1, 16);
 		}
 
-		this.drawCenteredString(poseStack, this.font, new TextComponent(this.menu.getMatterPercentage() + "%"), i + 134, j + 72, 16777215);
+		drawCenteredString(poseStack, this.font, new TextComponent(this.menu.getMatterPercentage() + "%"), i + 134, j + 72, 16777215);
 	}
 }

@@ -35,16 +35,14 @@ public class MatterRecipe implements Recipe<Container> {
 	}
 
 	public boolean matches(Container container, Level level) {
-		java.util.List<ItemStack> inputs = new java.util.ArrayList<>();
-
 		for (int j = 0; j < container.getContainerSize(); ++j) {
 			ItemStack itemstack = container.getItem(j);
 			if (!itemstack.isEmpty()) {
-				inputs.add(itemstack);
+				return this.getIngredients().stream().anyMatch(ingredient -> ingredient.test(itemstack));
 			}
 		}
 
-		return (net.minecraftforge.common.util.RecipeMatcher.findMatches(inputs, this.ingredients) != null);
+		return false;
 	}
 
 	public ItemStack assemble(Container container) {

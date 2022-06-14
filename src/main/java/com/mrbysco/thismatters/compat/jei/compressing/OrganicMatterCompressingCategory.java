@@ -34,7 +34,6 @@ public class OrganicMatterCompressingCategory implements IRecipeCategory<Compres
 
 	private final IDrawable background;
 	private final IDrawable icon;
-	private final IDrawable slotDrawable;
 	private final Component title;
 
 	public OrganicMatterCompressingCategory(IGuiHelper guiHelper) {
@@ -42,7 +41,6 @@ public class OrganicMatterCompressingCategory implements IRecipeCategory<Compres
 		this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM, new ItemStack(ThisRegistry.ORGANIC_MATTER_COMPRESSOR.get()));
 		this.title = new TranslatableComponent("thismatters.gui.jei.category.organic_matter_compressing");
 
-		this.slotDrawable = guiHelper.getSlotDrawable();
 		MatterUtil.reloadMatterList(Minecraft.getInstance().level);
 	}
 

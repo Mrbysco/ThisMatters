@@ -20,7 +20,7 @@ import net.minecraftforge.items.SlotItemHandler;
 import java.util.Objects;
 
 public class OrganicMatterCompressorMenu extends AbstractContainerMenu {
-	private OrganicMatterCompressorBlockEntity blockEntity;
+	private final OrganicMatterCompressorBlockEntity blockEntity;
 	private final ContainerData data;
 	protected final Level level;
 
@@ -101,10 +101,6 @@ public class OrganicMatterCompressorMenu extends AbstractContainerMenu {
 					}
 				} else if (this.isMatter(itemstack1)) {
 					if (!this.moveItemStackTo(itemstack1, 2, 11, false)) {
-						return ItemStack.EMPTY;
-					}
-				} else {
-					if (!this.moveItemStackTo(itemstack1, blockInventorySize, this.slots.size(), true)) {
 						return ItemStack.EMPTY;
 					}
 				}

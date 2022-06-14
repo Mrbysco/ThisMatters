@@ -29,7 +29,6 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -45,12 +44,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.TreeMap;
 
 public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity implements RecipeHolder {
-	public static TreeMap<Integer, Integer> cachedDefaults = new TreeMap<>();
+	public static final TreeMap<Integer, Integer> cachedValues = new TreeMap<>();
 
 	public final ItemStackHandler matterHandler = new ItemStackHandler(9) {
 		@Override
 		public boolean isItemValid(int slot, @NotNull ItemStack stack) {
-			return level.getRecipeManager().getRecipeFor((RecipeType<MatterRecipe>) ThisRecipes.MATTER_RECIPE_TYPE.get(), new SimpleContainer(stack), level) != null;
+			assert level != null;
+			return getMatterValue(level, stack) > 0;
 		}
 	};
 	private LazyOptional<IItemHandler> matterHolder = LazyOptional.of(() -> matterHandler);
@@ -62,6 +62,7 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 
 		@Override
 		protected void onContentsChanged(int slot) {
+			assert level != null;
 			compressingTotalTime = getTotalCompressingTime(level, new SimpleContainer(getStackInSlot(0)));
 			compressingProgress = 0;
 			setChanged();
@@ -170,7 +171,7 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 
 		ItemStack inputStack = compressorBlockEntity.inputHandler.getStackInSlot(0);
 		if (compressorBlockEntity.hasMatter() && !inputStack.isEmpty()) {
-			Recipe<?> recipe = level.getRecipeManager().getRecipeFor((RecipeType<CompressingRecipe>) ThisRecipes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE.get(), new SimpleContainer(inputStack), level).orElse(null);
+			Recipe<?> recipe = level.getRecipeManager().getRecipeFor(ThisRecipes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE.get(), new SimpleContainer(inputStack), level).orElse(null);
 			int i = compressorBlockEntity.getMaxStackSize();
 			if (compressorBlockEntity.hasMatter() && compressorBlockEntity.canCompress(recipe, i)) {
 				++compressorBlockEntity.compressingProgress;
@@ -370,15 +371,17 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 	}
 
 	public static int getMatterValue(Level level, ItemStack stack) {
-		return level.getRecipeManager().getRecipeFor((RecipeType<MatterRecipe>) ThisRecipes.MATTER_RECIPE_TYPE.get(), new SimpleContainer(stack), level).map(MatterRecipe::getMatterAmount).orElse(getDefaultMatterValue(stack));
+		int itemID = Item.getId(stack.getItem());
+		if (cachedValues.containsKey(itemID)) {
+			return cachedValues.get(itemID);
+		}
+		int value = level.getRecipeManager().getRecipeFor(ThisRecipes.MATTER_RECIPE_TYPE.get(), new SimpleContainer(stack), level)
+				.map(MatterRecipe::getMatterAmount).orElse(getDefaultMatterValue(stack));
+		cachedValues.put(itemID, value);
+		return value;
 	}
 
 	private static int getDefaultMatterValue(ItemStack stack) {
-		int itemID = Item.getId(stack.getItem());
-		if (cachedDefaults.containsKey(itemID)) {
-			return cachedDefaults.get(itemID);
-		}
-
 		int defaultValue = 0;
 		if (stack.getItem() instanceof BlockItem blockItem) {
 			Material material = blockItem.getBlock().defaultBlockState().getMaterial();
@@ -395,7 +398,6 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 				defaultValue = 2;
 			}
 		}
-		cachedDefaults.put(itemID, defaultValue);
 		return defaultValue;
 	}
 

@@ -1,7 +1,5 @@
 package com.mrbysco.thismatters.util;
 
-import com.mrbysco.thismatters.ThisMatters;
-import com.mrbysco.thismatters.block.OrganicMatterCompressorBlock;
 import com.mrbysco.thismatters.recipe.MatterRecipe;
 import com.mrbysco.thismatters.registry.ThisRecipes;
 import net.minecraft.world.item.BlockItem;
