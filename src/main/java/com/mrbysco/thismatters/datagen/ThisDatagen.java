@@ -7,6 +7,7 @@ import com.mrbysco.thismatters.ThisMatters;
 import com.mrbysco.thismatters.datagen.builder.CompressingRecipeBuilder;
 import com.mrbysco.thismatters.datagen.builder.MatterRecipeBuilder;
 import com.mrbysco.thismatters.registry.ThisRegistry;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.HashCache;
 import net.minecraft.data.loot.BlockLoot;
@@ -36,9 +37,9 @@ import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.common.data.LanguageProvider;
+import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.registries.RegistryObject;
 
 import javax.annotation.Nullable;
@@ -57,17 +58,17 @@ public class ThisDatagen {
 		ExistingFileHelper helper = event.getExistingFileHelper();
 
 		if (event.includeServer()) {
-			generator.addProvider(new Loots(generator));
-			generator.addProvider(new Recipes(generator));
+			generator.addProvider(event.includeServer(), new Loots(generator));
+			generator.addProvider(event.includeServer(), new Recipes(generator));
 			BlockTagsProvider provider;
-			generator.addProvider(provider = new ThisBlockTags(generator, helper));
-			generator.addProvider(new ThisItemTags(generator, provider, helper));
+			generator.addProvider(event.includeServer(), provider = new ThisBlockTags(generator, helper));
+			generator.addProvider(event.includeServer(), new ThisItemTags(generator, provider, helper));
 		}
 		if (event.includeClient()) {
-			generator.addProvider(new Language(generator));
-			generator.addProvider(new BlockModels(generator, helper));
-			generator.addProvider(new ItemModels(generator, helper));
-			generator.addProvider(new BlockStates(generator, helper));
+			generator.addProvider(event.includeServer(), new Language(generator));
+			generator.addProvider(event.includeServer(), new BlockModels(generator, helper));
+			generator.addProvider(event.includeServer(), new ItemModels(generator, helper));
+			generator.addProvider(event.includeServer(), new BlockStates(generator, helper));
 		}
 	}
 
@@ -152,7 +153,7 @@ public class ThisDatagen {
 		}
 
 		@Override
-		protected void saveAdvancement(HashCache p_126014_, JsonObject p_126015_, Path p_126016_) {
+		protected void saveAdvancement(CachedOutput p_126014_, JsonObject p_126015_, Path p_126016_) {
 			//NOOP
 		}
 	}
@@ -212,7 +213,7 @@ public class ThisDatagen {
 
 		@Override
 		protected void registerModels() {
-			withExistingParent(ThisRegistry.ORGANIC_MATTER_COMPRESSOR.get().getRegistryName().getPath(), modLoc("block/organic_matter_compressor"));
+			withExistingParent(ThisRegistry.ORGANIC_MATTER_COMPRESSOR.getId().getPath(), modLoc("block/organic_matter_compressor"));
 		}
 	}
 

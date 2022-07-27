@@ -5,7 +5,7 @@ import com.mrbysco.thismatters.config.ThisConfig;
 import com.mrbysco.thismatters.registry.ThisRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -44,9 +44,9 @@ public class OrganicMatterCompressorBlock extends BaseEntityBlock {
 						player.distanceToSqr((double) pos.getX() + 0.5D, (double) pos.getY() + 0.5D, (double) pos.getZ() + 0.5D) <= 64.0D;
 
 				if (!flag) {
-					player.displayClientMessage(new TranslatableComponent("thismatters.organic_matter_compressor.not_low_enough").withStyle(ChatFormatting.RED), true);
+					player.displayClientMessage(Component.translatable("thismatters.organic_matter_compressor.not_low_enough").withStyle(ChatFormatting.RED), true);
 				} else {
-					NetworkHooks.openGui((ServerPlayer) player, compressorBE, pos);
+					NetworkHooks.openScreen((ServerPlayer) player, compressorBE, pos);
 				}
 			}
 			return InteractionResult.CONSUME;

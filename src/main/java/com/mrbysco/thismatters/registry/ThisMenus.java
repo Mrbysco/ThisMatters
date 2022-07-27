@@ -9,7 +9,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
 public class ThisMenus {
-	public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(ForgeRegistries.CONTAINERS, ThisMatters.MOD_ID);
+	public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(ForgeRegistries.MENU_TYPES, ThisMatters.MOD_ID);
 
-	public static final RegistryObject<MenuType<OrganicMatterCompressorMenu>> ORGANIC_MATTER_COMPRESSOR = MENUS.register("organic_matter_compressor", () -> IForgeMenuType.create(OrganicMatterCompressorMenu::new));
+	public static final RegistryObject<MenuType<OrganicMatterCompressorMenu>> ORGANIC_MATTER_COMPRESSOR = MENU_TYPES.register("organic_matter_compressor", () -> IForgeMenuType.create(OrganicMatterCompressorMenu::new));
 }

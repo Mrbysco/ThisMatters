@@ -17,13 +17,13 @@ import net.minecraftforge.registries.RegistryObject;
 public class ThisRegistry {
 	public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, ThisMatters.MOD_ID);
 	public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, ThisMatters.MOD_ID);
-	public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, ThisMatters.MOD_ID);
+	public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, ThisMatters.MOD_ID);
 
 	public static final RegistryObject<Block> ORGANIC_MATTER_COMPRESSOR = BLOCKS.register("organic_matter_compressor", () ->
 			new OrganicMatterCompressorBlock(Block.Properties.of(Material.HEAVY_METAL, MaterialColor.COLOR_BLACK)
 					.requiresCorrectToolForDrops().strength(5.0F, 120.0F).randomTicks().sound(SoundType.STONE).noOcclusion()));
 
-	public static final RegistryObject<BlockEntityType<OrganicMatterCompressorBlockEntity>> ORGANIC_MATTER_COMPRESSOR_BE = BLOCK_ENTITIES.register("organic_matter_compressor", () ->
+	public static final RegistryObject<BlockEntityType<OrganicMatterCompressorBlockEntity>> ORGANIC_MATTER_COMPRESSOR_BE = BLOCK_ENTITY_TYPES.register("organic_matter_compressor", () ->
 			BlockEntityType.Builder.of(OrganicMatterCompressorBlockEntity::new, ORGANIC_MATTER_COMPRESSOR.get()).build(null));
 
 	public static final RegistryObject<Item> ORGANIC_MATTER_COMPRESSOR_ITEM = ITEMS.register("organic_matter_compressor", () ->

@@ -34,11 +34,11 @@ public class ThisMatters {
 		eventBus.register(ThisConfig.class);
 
 		ThisRegistry.BLOCKS.register(eventBus);
-		ThisRegistry.BLOCK_ENTITIES.register(eventBus);
+		ThisRegistry.BLOCK_ENTITY_TYPES.register(eventBus);
 		ThisRegistry.ITEMS.register(eventBus);
 		ThisRecipes.RECIPE_TYPES.register(eventBus);
 		ThisRecipes.RECIPE_SERIALIZERS.register(eventBus);
-		ThisMenus.MENUS.register(eventBus);
+		ThisMenus.MENU_TYPES.register(eventBus);
 
 		DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
 			eventBus.addListener(ClientHandler::onClientSetup);
