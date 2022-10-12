@@ -5,6 +5,9 @@
       "tag": "forge:rods/wooden"
     },
     {
+      "item": "minecraft:bamboo"
+    },
+    {
       "tag": "minecraft:leaves"
     }
   ],

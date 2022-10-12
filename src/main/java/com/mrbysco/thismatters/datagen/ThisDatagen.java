@@ -111,7 +111,7 @@ public class ThisDatagen {
 		@Override
 		protected void buildCraftingRecipes(Consumer<FinishedRecipe> recipeConsumer) {
 			MatterRecipeBuilder.matter(new ResourceLocation(ThisMatters.MOD_ID, "1_matter"), 1)
-					.requires(Tags.Items.RODS_WOODEN).requires(ItemTags.LEAVES).save(recipeConsumer);
+					.requires(Tags.Items.RODS_WOODEN).requires(Items.BAMBOO).requires(ItemTags.LEAVES).save(recipeConsumer);
 
 			MatterRecipeBuilder.matter(new ResourceLocation(ThisMatters.MOD_ID, "2_matter"), 2)
 					.requires(Items.WOODEN_SWORD).requires(Items.WOODEN_HOE).requires(Items.WOODEN_AXE)
