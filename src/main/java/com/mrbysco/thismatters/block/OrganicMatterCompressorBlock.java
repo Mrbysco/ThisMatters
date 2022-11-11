@@ -39,14 +39,15 @@ public class OrganicMatterCompressorBlock extends BaseEntityBlock {
 			return InteractionResult.SUCCESS;
 		} else {
 			if (level.getBlockEntity(pos) instanceof OrganicMatterCompressorBlockEntity compressorBE) {
-				int minY = Mth.clamp(ThisConfig.COMMON.minY.get(), level.getMinBuildHeight(), level.getMaxBuildHeight());
-				boolean flag = pos.getY() <= minY &&
-						player.distanceToSqr((double) pos.getX() + 0.5D, (double) pos.getY() + 0.5D, (double) pos.getZ() + 0.5D) <= 64.0D;
-
-				if (!flag) {
-					player.displayClientMessage(Component.translatable("thismatters.organic_matter_compressor.not_low_enough").withStyle(ChatFormatting.RED), true);
-				} else {
-					NetworkHooks.openScreen((ServerPlayer) player, compressorBE, pos);
+				boolean flag = player.distanceToSqr((double) pos.getX() + 0.5D, (double) pos.getY() + 0.5D, (double) pos.getZ() + 0.5D) <= 64.0D;
+				if(flag) {
+					int minY = Mth.clamp(ThisConfig.COMMON.minY.get(), level.getMinBuildHeight(), level.getMaxBuildHeight());
+					boolean flag2 = pos.getY() <= minY;
+					if (flag2) {
+						NetworkHooks.openScreen((ServerPlayer) player, compressorBE, pos);
+					} else {
+						player.displayClientMessage(Component.translatable("thismatters.organic_matter_compressor.not_low_enough").withStyle(ChatFormatting.RED), true);
+					}
 				}
 			}
 			return InteractionResult.CONSUME;

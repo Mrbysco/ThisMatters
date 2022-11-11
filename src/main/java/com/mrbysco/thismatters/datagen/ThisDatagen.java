@@ -111,7 +111,12 @@ public class ThisDatagen {
 		@Override
 		protected void buildCraftingRecipes(Consumer<FinishedRecipe> recipeConsumer) {
 			MatterRecipeBuilder.matter(new ResourceLocation(ThisMatters.MOD_ID, "1_matter"), 1)
-					.requires(Tags.Items.RODS_WOODEN).requires(Items.BAMBOO).requires(ItemTags.LEAVES).save(recipeConsumer);
+					.requires(Tags.Items.RODS_WOODEN).requires(Items.BAMBOO).requires(ItemTags.LEAVES)
+					.requires(Items.DEAD_BRAIN_CORAL).requires(Items.DEAD_BUBBLE_CORAL).requires(Items.DEAD_FIRE_CORAL)
+					.requires(Items.DEAD_HORN_CORAL).requires(Items.DEAD_TUBE_CORAL).requires(Items.DEAD_TUBE_CORAL_FAN)
+					.requires(Items.DEAD_BRAIN_CORAL_FAN).requires(Items.DEAD_BUBBLE_CORAL_FAN).requires(Items.DEAD_FIRE_CORAL_FAN)
+					.requires(Items.DEAD_HORN_CORAL_FAN)
+					.save(recipeConsumer);
 
 			MatterRecipeBuilder.matter(new ResourceLocation(ThisMatters.MOD_ID, "2_matter"), 2)
 					.requires(Items.WOODEN_SWORD).requires(Items.WOODEN_HOE).requires(Items.WOODEN_AXE)
@@ -127,6 +132,11 @@ public class ThisDatagen {
 					.requires(Tags.Items.CROPS).requires(Tags.Items.DYES).requires(Items.SUGAR_CANE)
 					.requires(Tags.Items.FEATHERS).requires(Tags.Items.EGGS).requires(ItemTags.WOODEN_SLABS)
 					.requires(ItemTags.WOODEN_STAIRS).requires(ItemTags.WOODEN_FENCES).requires(ItemTags.WOODEN_BUTTONS)
+					.requires(Items.TUBE_CORAL).requires(Items.BRAIN_CORAL).requires(Items.BUBBLE_CORAL)
+					.requires(Items.FIRE_CORAL).requires(Items.HORN_CORAL).requires(Items.TUBE_CORAL_FAN)
+					.requires(Items.BRAIN_CORAL_FAN).requires(Items.BUBBLE_CORAL_FAN).requires(Items.FIRE_CORAL_FAN)
+					.requires(Items.HORN_CORAL_FAN).requires(Items.DEAD_TUBE_CORAL_BLOCK).requires(Items.DEAD_BRAIN_CORAL_BLOCK)
+					.requires(Items.DEAD_BUBBLE_CORAL_BLOCK).requires(Items.DEAD_FIRE_CORAL_BLOCK).requires(Items.DEAD_HORN_CORAL_BLOCK)
 					.requires(ItemTags.WOODEN_PRESSURE_PLATES).requires(ItemTags.SAPLINGS).save(recipeConsumer);
 
 			MatterRecipeBuilder.matter(new ResourceLocation(ThisMatters.MOD_ID, "4_matter"), 4)
@@ -134,7 +144,9 @@ public class ThisDatagen {
 					.requires(Items.MUSIC_DISC_BLOCKS).requires(Items.MUSIC_DISC_CHIRP).requires(Items.MUSIC_DISC_FAR)
 					.requires(Items.MUSIC_DISC_MALL).requires(Items.MUSIC_DISC_MELLOHI).requires(Items.MUSIC_DISC_STAL)
 					.requires(Items.MUSIC_DISC_STRAD).requires(Items.MUSIC_DISC_WARD).requires(Items.MUSIC_DISC_11)
-					.requires(Items.MUSIC_DISC_WAIT).requires(Items.MUSIC_DISC_OTHERSIDE).requires(Items.MUSIC_DISC_PIGSTEP).save(recipeConsumer);
+					.requires(Items.MUSIC_DISC_WAIT).requires(Items.MUSIC_DISC_OTHERSIDE).requires(Items.MUSIC_DISC_PIGSTEP)
+					.requires(Items.TUBE_CORAL_BLOCK).requires(Items.BRAIN_CORAL_BLOCK).requires(Items.BUBBLE_CORAL_BLOCK)
+					.requires(Items.FIRE_CORAL_BLOCK).requires(Items.HORN_CORAL_BLOCK).save(recipeConsumer);
 
 			MatterRecipeBuilder.matter(new ResourceLocation(ThisMatters.MOD_ID, "8_matter"), 8)
 					.requires(Tags.Items.HEADS).save(recipeConsumer);

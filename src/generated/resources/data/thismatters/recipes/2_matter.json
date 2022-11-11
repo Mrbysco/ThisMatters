@@ -128,6 +128,51 @@
       "tag": "minecraft:wooden_buttons"
     },
     {
+      "item": "minecraft:tube_coral"
+    },
+    {
+      "item": "minecraft:brain_coral"
+    },
+    {
+      "item": "minecraft:bubble_coral"
+    },
+    {
+      "item": "minecraft:fire_coral"
+    },
+    {
+      "item": "minecraft:horn_coral"
+    },
+    {
+      "item": "minecraft:tube_coral_fan"
+    },
+    {
+      "item": "minecraft:brain_coral_fan"
+    },
+    {
+      "item": "minecraft:bubble_coral_fan"
+    },
+    {
+      "item": "minecraft:fire_coral_fan"
+    },
+    {
+      "item": "minecraft:horn_coral_fan"
+    },
+    {
+      "item": "minecraft:dead_tube_coral_block"
+    },
+    {
+      "item": "minecraft:dead_brain_coral_block"
+    },
+    {
+      "item": "minecraft:dead_bubble_coral_block"
+    },
+    {
+      "item": "minecraft:dead_fire_coral_block"
+    },
+    {
+      "item": "minecraft:dead_horn_coral_block"
+    },
+    {
       "tag": "minecraft:wooden_pressure_plates"
     },
     {
