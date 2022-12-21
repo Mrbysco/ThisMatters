@@ -13,7 +13,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class ThisRecipes {
 	public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, ThisMatters.MOD_ID);
-	public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(Registry.RECIPE_TYPE_REGISTRY, ThisMatters.MOD_ID);
+	public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(ForgeRegistries.RECIPE_TYPES, ThisMatters.MOD_ID);
 
 	public static final RegistryObject<RecipeType<CompressingRecipe>> ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE = RECIPE_TYPES.register("organic_matter_compression", () -> new RecipeType<>() {
 	});

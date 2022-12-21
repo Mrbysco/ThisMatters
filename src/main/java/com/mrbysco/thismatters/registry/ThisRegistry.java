@@ -27,5 +27,5 @@ public class ThisRegistry {
 			BlockEntityType.Builder.of(OrganicMatterCompressorBlockEntity::new, ORGANIC_MATTER_COMPRESSOR.get()).build(null));
 
 	public static final RegistryObject<Item> ORGANIC_MATTER_COMPRESSOR_ITEM = ITEMS.register("organic_matter_compressor", () ->
-			new BlockItem(ORGANIC_MATTER_COMPRESSOR.get(), new Item.Properties().tab(ThisMatters.TAB_MAIN)));
+			new BlockItem(ORGANIC_MATTER_COMPRESSOR.get(), new Item.Properties()));
 }

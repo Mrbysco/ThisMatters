@@ -7,14 +7,16 @@ import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.CriterionTriggerInstance;
 import net.minecraft.advancements.RequirementsStrategy;
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeBuilder;
+import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
@@ -55,8 +57,9 @@ public class CompressingRecipeBuilder implements RecipeBuilder {
 		this.ensureValid(location);
 		this.advancement.parent(new ResourceLocation("recipes/root")).addCriterion("has_the_recipe",
 				RecipeUnlockedTrigger.unlocked(location)).rewards(AdvancementRewards.Builder.recipe(location)).requirements(RequirementsStrategy.OR);
-		recipeConsumer.accept(new CompressingRecipeBuilder.Result(location, this.group == null ? "" : this.group, this.ingredient, this.result, this.compressingTime,
-				this.advancement, new ResourceLocation(location.getNamespace(), "recipes/" + this.result.getItemCategory().getRecipeFolderName() + "/" + location.getPath())));
+		recipeConsumer.accept(new CompressingRecipeBuilder.Result(location, this.group == null ? "" : this.group,
+				this.ingredient, this.result, this.compressingTime,
+				this.advancement, new ResourceLocation(location.getNamespace(), "recipes/" + RecipeCategory.MISC.getFolderName() + "/" + location.getPath())));
 	}
 
 	private void ensureValid(ResourceLocation location) {
@@ -90,7 +93,7 @@ public class CompressingRecipeBuilder implements RecipeBuilder {
 			}
 
 			jsonObject.add("ingredient", this.ingredient.toJson());
-			jsonObject.addProperty("result", Registry.ITEM.getKey(this.result).toString());
+			jsonObject.addProperty("result", ForgeRegistries.ITEMS.getKey(this.result).toString());
 			jsonObject.addProperty("compressingtime", this.compressingTime);
 		}
 

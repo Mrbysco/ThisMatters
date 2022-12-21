@@ -1,93 +1,93 @@
 package com.mrbysco.thismatters.datagen;
 
-import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonObject;
-import com.mojang.datafixers.util.Pair;
 import com.mrbysco.thismatters.ThisMatters;
 import com.mrbysco.thismatters.datagen.builder.CompressingRecipeBuilder;
 import com.mrbysco.thismatters.datagen.builder.MatterRecipeBuilder;
 import com.mrbysco.thismatters.registry.ThisRegistry;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.loot.BlockLoot;
+import net.minecraft.data.PackOutput;
+import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.data.tags.BlockTagsProvider;
 import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.LootTable.Builder;
 import net.minecraft.world.level.storage.loot.LootTables;
 import net.minecraft.world.level.storage.loot.ValidationContext;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraftforge.client.model.generators.BlockModelProvider;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.Tags;
+import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.common.data.LanguageProvider;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.RegistryObject;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ThisDatagen {
 	@SubscribeEvent
 	public static void gatherData(GatherDataEvent event) {
 		DataGenerator generator = event.getGenerator();
+		PackOutput packOutput = generator.getPackOutput();
+		CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
 		ExistingFileHelper helper = event.getExistingFileHelper();
 
 		if (event.includeServer()) {
-			generator.addProvider(event.includeServer(), new Loots(generator));
-			generator.addProvider(event.includeServer(), new Recipes(generator));
+			generator.addProvider(event.includeServer(), new Loots(packOutput));
+			generator.addProvider(event.includeServer(), new Recipes(packOutput));
 			BlockTagsProvider provider;
-			generator.addProvider(event.includeServer(), provider = new ThisBlockTags(generator, helper));
-			generator.addProvider(event.includeServer(), new ThisItemTags(generator, provider, helper));
+			generator.addProvider(event.includeServer(), provider = new ThisBlockTags(packOutput, lookupProvider, helper));
+			generator.addProvider(event.includeServer(), new ThisItemTags(packOutput, lookupProvider, provider, helper));
 		}
 		if (event.includeClient()) {
-			generator.addProvider(event.includeServer(), new Language(generator));
-			generator.addProvider(event.includeServer(), new BlockModels(generator, helper));
-			generator.addProvider(event.includeServer(), new ItemModels(generator, helper));
-			generator.addProvider(event.includeServer(), new BlockStates(generator, helper));
+			generator.addProvider(event.includeServer(), new Language(packOutput));
+			generator.addProvider(event.includeServer(), new BlockModels(packOutput, helper));
+			generator.addProvider(event.includeServer(), new ItemModels(packOutput, helper));
+			generator.addProvider(event.includeServer(), new BlockStates(packOutput, helper));
 		}
 	}
 
 	private static class Loots extends LootTableProvider {
-		public Loots(DataGenerator gen) {
-			super(gen);
+		public Loots(PackOutput packOutput) {
+			super(packOutput, Set.of(), List.of(
+					new SubProviderEntry(ThisBlockLoot::new, LootContextParamSets.BLOCK)
+			));
 		}
 
-		@Override
-		protected List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, Builder>>>, LootContextParamSet>> getTables() {
-			return ImmutableList.of(
-					Pair.of(GeOreBlockTables::new, LootContextParamSets.BLOCK)
-			);
-		}
+		public static class ThisBlockLoot extends BlockLootSubProvider {
 
-		public static class GeOreBlockTables extends BlockLoot {
+			protected ThisBlockLoot() {
+				super(Set.of(), FeatureFlags.REGISTRY.allFlags());
+			}
 
 			@Override
-			protected void addTables() {
-				this.add(ThisRegistry.ORGANIC_MATTER_COMPRESSOR.get(), BlockLoot::createNameableBlockEntityTable);
+			protected void generate() {
+				this.add(ThisRegistry.ORGANIC_MATTER_COMPRESSOR.get(), createNameableBlockEntityTable(ThisRegistry.ORGANIC_MATTER_COMPRESSOR.get()));
 			}
 
 			@Override
@@ -104,12 +104,12 @@ public class ThisDatagen {
 
 	public static class Recipes extends RecipeProvider {
 
-		public Recipes(DataGenerator generator) {
-			super(generator);
+		public Recipes(PackOutput packOutput) {
+			super(packOutput);
 		}
 
 		@Override
-		protected void buildCraftingRecipes(Consumer<FinishedRecipe> recipeConsumer) {
+		protected void buildRecipes(Consumer<FinishedRecipe> recipeConsumer) {
 			MatterRecipeBuilder.matter(new ResourceLocation(ThisMatters.MOD_ID, "1_matter"), 1)
 					.requires(Tags.Items.RODS_WOODEN).requires(Items.BAMBOO).requires(ItemTags.LEAVES)
 					.requires(Items.DEAD_BRAIN_CORAL).requires(Items.DEAD_BUBBLE_CORAL).requires(Items.DEAD_FIRE_CORAL)
@@ -151,7 +151,7 @@ public class ThisDatagen {
 			MatterRecipeBuilder.matter(new ResourceLocation(ThisMatters.MOD_ID, "8_matter"), 8)
 					.requires(Tags.Items.HEADS).save(recipeConsumer);
 
-			ShapedRecipeBuilder.shaped(ThisRegistry.ORGANIC_MATTER_COMPRESSOR.get())
+			ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, ThisRegistry.ORGANIC_MATTER_COMPRESSOR.get())
 					.define('E', Tags.Items.GEMS_EMERALD)
 					.define('O', Tags.Items.OBSIDIAN)
 					.define('C', Items.CAULDRON)
@@ -164,14 +164,14 @@ public class ThisDatagen {
 		}
 
 		@Override
-		protected void saveAdvancement(CachedOutput p_126014_, JsonObject p_126015_, Path p_126016_) {
-			//NOOP
+		protected @Nullable CompletableFuture<?> saveAdvancement(CachedOutput output, FinishedRecipe finishedRecipe, JsonObject advancementJson) {
+			return null;
 		}
 	}
 
 	private static class Language extends LanguageProvider {
-		public Language(DataGenerator gen) {
-			super(gen, ThisMatters.MOD_ID, "en_us");
+		public Language(PackOutput packOutput) {
+			super(packOutput, ThisMatters.MOD_ID, "en_us");
 		}
 
 		@Override
@@ -190,8 +190,8 @@ public class ThisDatagen {
 	}
 
 	private static class BlockStates extends BlockStateProvider {
-		public BlockStates(DataGenerator gen, ExistingFileHelper helper) {
-			super(gen, ThisMatters.MOD_ID, helper);
+		public BlockStates(PackOutput packOutput, ExistingFileHelper helper) {
+			super(packOutput, ThisMatters.MOD_ID, helper);
 		}
 
 		@Override
@@ -207,8 +207,8 @@ public class ThisDatagen {
 	}
 
 	private static class BlockModels extends BlockModelProvider {
-		public BlockModels(DataGenerator gen, ExistingFileHelper helper) {
-			super(gen, ThisMatters.MOD_ID, helper);
+		public BlockModels(PackOutput packOutput, ExistingFileHelper helper) {
+			super(packOutput, ThisMatters.MOD_ID, helper);
 		}
 
 		@Override
@@ -218,8 +218,8 @@ public class ThisDatagen {
 	}
 
 	private static class ItemModels extends ItemModelProvider {
-		public ItemModels(DataGenerator gen, ExistingFileHelper helper) {
-			super(gen, ThisMatters.MOD_ID, helper);
+		public ItemModels(PackOutput packOutput, ExistingFileHelper helper) {
+			super(packOutput, ThisMatters.MOD_ID, helper);
 		}
 
 		@Override
@@ -229,23 +229,23 @@ public class ThisDatagen {
 	}
 
 	public static class ThisBlockTags extends BlockTagsProvider {
-		public ThisBlockTags(DataGenerator generator, @Nullable ExistingFileHelper existingFileHelper) {
-			super(generator, ThisMatters.MOD_ID, existingFileHelper);
+		public ThisBlockTags(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, @Nullable ExistingFileHelper existingFileHelper) {
+			super(output, lookupProvider, ThisMatters.MOD_ID, existingFileHelper);
 		}
 
 		@Override
-		protected void addTags() {
+		protected void addTags(HolderLookup.Provider provider) {
 			this.tag(BlockTags.MINEABLE_WITH_PICKAXE).add(ThisRegistry.ORGANIC_MATTER_COMPRESSOR.get());
 		}
 	}
 
 	public static class ThisItemTags extends ItemTagsProvider {
-		public ThisItemTags(DataGenerator dataGenerator, BlockTagsProvider blockTagsProvider, ExistingFileHelper existingFileHelper) {
-			super(dataGenerator, blockTagsProvider, ThisMatters.MOD_ID, existingFileHelper);
+		public ThisItemTags(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, BlockTagsProvider blockTagsProvider, ExistingFileHelper existingFileHelper) {
+			super(output, lookupProvider, blockTagsProvider, ThisMatters.MOD_ID, existingFileHelper);
 		}
 
 		@Override
-		protected void addTags() {
+		protected void addTags(HolderLookup.Provider provider) {
 
 		}
 	}
