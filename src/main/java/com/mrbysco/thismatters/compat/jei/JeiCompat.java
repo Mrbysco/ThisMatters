@@ -14,7 +14,6 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
-import mezz.jei.util.ErrorUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceLocation;
@@ -54,7 +53,7 @@ public class JeiCompat implements IModPlugin {
 
 	@Override
 	public void registerRecipes(IRecipeRegistration registration) {
-		ErrorUtil.checkNotNull(ORGANIC_MATTER_COMPRESSING_TYPE, "organicMatterCompressingType");
+		assert ORGANIC_MATTER_COMPRESSING_TYPE != null;
 
 		ClientLevel world = Objects.requireNonNull(Minecraft.getInstance().level);
 		registration.addRecipes(ORGANIC_MATTER_COMPRESSING_TYPE, world.getRecipeManager().getAllRecipesFor(ThisRecipes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE.get()));
