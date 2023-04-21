@@ -6,7 +6,6 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -26,13 +25,11 @@ public class MatterUtil {
 		if (level != null) {
 			final List<MatterRecipe> matterRecipeList = level.getRecipeManager().getAllRecipesFor(ThisRecipes.MATTER_RECIPE_TYPE.get());
 			Map<Integer, List<ItemStack>> matterMap = new HashMap<>();
-			List<ItemLike> items = new ArrayList<>();
 			for (MatterRecipe matterRecipe : matterRecipeList) {
 				List<ItemStack> ingredientList = matterMap.getOrDefault(matterRecipe.getMatterAmount(), new ArrayList<>());
 				for (Ingredient ingredient : matterRecipe.getIngredients()) {
 					ingredientList.addAll(Arrays.asList(ingredient.getItems()));
 				}
-				ingredientList.forEach((stack) -> items.add(stack.getItem()));
 				Collections.shuffle(ingredientList);
 
 				matterMap.put(matterRecipe.getMatterAmount(), ingredientList);

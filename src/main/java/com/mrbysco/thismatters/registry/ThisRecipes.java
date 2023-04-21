@@ -4,7 +4,6 @@ import com.mrbysco.thismatters.ThisMatters;
 import com.mrbysco.thismatters.recipe.CompressingRecipe;
 import com.mrbysco.thismatters.recipe.CompressingRecipe.Serializer;
 import com.mrbysco.thismatters.recipe.MatterRecipe;
-import net.minecraft.core.Registry;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.registries.DeferredRegister;

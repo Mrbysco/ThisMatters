@@ -40,7 +40,7 @@ public class OrganicMatterCompressorBlock extends BaseEntityBlock {
 		} else {
 			if (level.getBlockEntity(pos) instanceof OrganicMatterCompressorBlockEntity compressorBE) {
 				boolean flag = player.distanceToSqr((double) pos.getX() + 0.5D, (double) pos.getY() + 0.5D, (double) pos.getZ() + 0.5D) <= 64.0D;
-				if(flag) {
+				if (flag) {
 					int minY = Mth.clamp(ThisConfig.COMMON.minY.get(), level.getMinBuildHeight(), level.getMaxBuildHeight());
 					boolean flag2 = pos.getY() <= minY;
 					if (flag2) {
