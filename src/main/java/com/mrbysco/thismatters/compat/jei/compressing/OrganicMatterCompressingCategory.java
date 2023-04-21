@@ -21,6 +21,8 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -65,6 +67,13 @@ public class OrganicMatterCompressingCategory implements IRecipeCategory<Compres
 
 	@Override
 	public void setRecipe(IRecipeLayoutBuilder builder, CompressingRecipe recipe, IFocusGroup focuses) {
+		Minecraft minecraft = Minecraft.getInstance();
+		ClientLevel level = minecraft.level;
+		if (level == null) {
+			throw new NullPointerException("level must not be null.");
+		}
+		RegistryAccess registryAccess = level.registryAccess();
+
 		builder.addSlot(RecipeIngredientRole.INPUT, 95, 2).addIngredients(recipe.getIngredients().get(0));
 
 		for (int i = 0; i < 3; ++i) {
@@ -78,7 +87,7 @@ public class OrganicMatterCompressingCategory implements IRecipeCategory<Compres
 			}
 		}
 
-		builder.addSlot(RecipeIngredientRole.OUTPUT, 95, 38).addItemStack(recipe.getResultItem());
+		builder.addSlot(RecipeIngredientRole.OUTPUT, 95, 38).addItemStack(recipe.getResultItem(registryAccess));
 	}
 
 	@Override

@@ -241,7 +241,7 @@ public class ThisDatagen {
 
 	public static class ThisItemTags extends ItemTagsProvider {
 		public ThisItemTags(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, BlockTagsProvider blockTagsProvider, ExistingFileHelper existingFileHelper) {
-			super(output, lookupProvider, blockTagsProvider, ThisMatters.MOD_ID, existingFileHelper);
+			super(output, lookupProvider, blockTagsProvider.contentsGetter(), ThisMatters.MOD_ID, existingFileHelper);
 		}
 
 		@Override

@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mrbysco.thismatters.registry.ThisRecipes;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -38,6 +39,11 @@ public class CompressingRecipe implements Recipe<Container> {
 		return this.ingredient.test(container.getItem(0));
 	}
 
+	@Override
+	public ItemStack assemble(Container container, RegistryAccess registryAccess) {
+		return getResultItem(registryAccess).copy();
+	}
+
 	public ItemStack assemble(Container container) {
 		return this.result.copy();
 	}
@@ -52,7 +58,8 @@ public class CompressingRecipe implements Recipe<Container> {
 		return nonnulllist;
 	}
 
-	public ItemStack getResultItem() {
+	@Override
+	public ItemStack getResultItem(RegistryAccess registryAccess) {
 		return this.result;
 	}
 

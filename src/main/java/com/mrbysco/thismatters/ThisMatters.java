@@ -52,7 +52,7 @@ public class ThisMatters {
 		TAB_MAIN = event.registerCreativeModeTab(new ResourceLocation(MOD_ID, "tab"), builder ->
 				builder.icon(() -> new ItemStack(ThisRegistry.ORGANIC_MATTER_COMPRESSOR.get()))
 						.title(Component.translatable("itemGroup.thismatters"))
-						.displayItems((features, output, hasPermissions) -> {
+						.displayItems((displayParameters, output) -> {
 							List<ItemStack> stacks = ThisRegistry.ITEMS.getEntries().stream().map(reg -> new ItemStack(reg.get())).toList();
 							output.acceptAll(stacks);
 						}));

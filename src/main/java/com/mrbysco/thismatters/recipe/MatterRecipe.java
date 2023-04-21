@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mrbysco.thismatters.registry.ThisRecipes;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -44,8 +45,9 @@ public class MatterRecipe implements Recipe<Container> {
 		return false;
 	}
 
-	public ItemStack assemble(Container container) {
-		return this.result.copy();
+	@Override
+	public ItemStack assemble(Container container, RegistryAccess registryAccess) {
+		return getResultItem(registryAccess).copy();
 	}
 
 	public boolean canCraftInDimensions(int width, int height) {
@@ -56,7 +58,8 @@ public class MatterRecipe implements Recipe<Container> {
 		return this.ingredients;
 	}
 
-	public ItemStack getResultItem() {
+	@Override
+	public ItemStack getResultItem(RegistryAccess registryAccess) {
 		return this.result;
 	}
 
