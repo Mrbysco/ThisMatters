@@ -1,0 +1,9 @@
+{
+  "type": "thismatters:matter_recipe",
+  "ingredients": [
+    {
+      "tag": "minecraft:warped_stems"
+    }
+  ],
+  "matter": 5
+}

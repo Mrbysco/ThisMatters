@@ -1,9 +1,9 @@
 package com.mrbysco.thismatters.client.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrbysco.thismatters.ThisMatters;
 import com.mrbysco.thismatters.menu.OrganicMatterCompressorMenu;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
@@ -25,26 +25,24 @@ public class OrganicMatterCompressorScreen extends AbstractContainerScreen<Organ
 	}
 
 	@Override
-	public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
-		this.renderBackground(poseStack);
-		super.render(poseStack, mouseX, mouseY, partialTicks);
-		this.renderTooltip(poseStack, mouseX, mouseY);
+	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+		this.renderBackground(guiGraphics);
+		super.render(guiGraphics, mouseX, mouseY, partialTicks);
+		this.renderTooltip(guiGraphics, mouseX, mouseY);
 	}
 
 	@Override
-	protected void renderBg(PoseStack poseStack, float partialTicks, int x, int y) {
+	protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int x, int y) {
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
-		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-		RenderSystem.setShaderTexture(0, SCREEN_LOCATION);
 
 		int i = this.leftPos;
 		int j = this.topPos;
-		this.blit(poseStack, i, j, 0, 0, this.imageWidth, this.imageHeight);
+		guiGraphics.blit(SCREEN_LOCATION, i, j, 0, 0, this.imageWidth, this.imageHeight);
 		if (this.menu.hasMatter()) {
 			int l = this.menu.getCompressionProgress();
-			this.blit(poseStack, i + 94, j + 36, 176, 0, l + 1, 16);
+			guiGraphics.blit(SCREEN_LOCATION, i + 94, j + 36, 176, 0, l + 1, 16);
 		}
 
-		drawCenteredString(poseStack, this.font, Component.literal(this.menu.getMatterPercentage() + "%"), i + 134, j + 72, 16777215);
+		guiGraphics.drawCenteredString(this.font, Component.literal(this.menu.getMatterPercentage() + "%"), i + 134, j + 72, 16777215);
 	}
 }

@@ -31,7 +31,7 @@ public class OrganicMatterCompressorMenu extends AbstractContainerMenu {
 	private static OrganicMatterCompressorBlockEntity getBlockEntity(final Inventory playerInventory, final FriendlyByteBuf data) {
 		Objects.requireNonNull(playerInventory, "playerInventory cannot be null!");
 		Objects.requireNonNull(data, "data cannot be null!");
-		final BlockEntity tileAtPos = playerInventory.player.level.getBlockEntity(data.readBlockPos());
+		final BlockEntity tileAtPos = playerInventory.player.level().getBlockEntity(data.readBlockPos());
 
 		if (tileAtPos instanceof OrganicMatterCompressorBlockEntity compressorBlockEntity) {
 			return compressorBlockEntity;
@@ -45,7 +45,7 @@ public class OrganicMatterCompressorMenu extends AbstractContainerMenu {
 
 		this.blockEntity = compressorBlockEntity;
 		this.data = compressorBlockEntity.getDataAccess();
-		this.level = playerInventoryIn.player.level;
+		this.level = playerInventoryIn.player.level();
 		checkContainerDataCount(data, 4);
 
 		this.addSlot(new SlotItemHandler(blockEntity.getInputInventory(), 0, 126, 17));

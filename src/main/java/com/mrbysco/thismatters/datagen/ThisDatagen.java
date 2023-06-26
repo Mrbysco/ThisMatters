@@ -25,7 +25,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.LootTables;
 import net.minecraft.world.level.storage.loot.ValidationContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraftforge.client.model.generators.BlockModelProvider;
@@ -98,7 +97,7 @@ public class ThisDatagen {
 
 		@Override
 		protected void validate(Map<ResourceLocation, LootTable> map, ValidationContext validationContext) {
-			map.forEach((name, table) -> LootTables.validate(validationContext, name, table));
+			map.forEach((name, table) -> table.validate(validationContext));
 		}
 	}
 
@@ -147,6 +146,9 @@ public class ThisDatagen {
 					.requires(Items.MUSIC_DISC_WAIT).requires(Items.MUSIC_DISC_OTHERSIDE).requires(Items.MUSIC_DISC_PIGSTEP)
 					.requires(Items.TUBE_CORAL_BLOCK).requires(Items.BRAIN_CORAL_BLOCK).requires(Items.BUBBLE_CORAL_BLOCK)
 					.requires(Items.FIRE_CORAL_BLOCK).requires(Items.HORN_CORAL_BLOCK).save(recipeConsumer);
+
+			MatterRecipeBuilder.matter(new ResourceLocation(ThisMatters.MOD_ID, "5_matter"), 5)
+					.requires(ItemTags.WARPED_STEMS).save(recipeConsumer);
 
 			MatterRecipeBuilder.matter(new ResourceLocation(ThisMatters.MOD_ID, "8_matter"), 8)
 					.requires(Tags.Items.HEADS).save(recipeConsumer);

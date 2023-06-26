@@ -1,6 +1,5 @@
 package com.mrbysco.thismatters.compat.jei.compressing;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrbysco.thismatters.ThisMatters;
 import com.mrbysco.thismatters.compat.jei.JeiCompat;
 import com.mrbysco.thismatters.recipe.CompressingRecipe;
@@ -21,6 +20,7 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
@@ -91,10 +91,10 @@ public class OrganicMatterCompressingCategory implements IRecipeCategory<Compres
 	}
 
 	@Override
-	public void draw(CompressingRecipe recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
+	public void draw(CompressingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
 		Font font = Minecraft.getInstance().font;
 		MutableComponent component = Component.literal((int) (recipe.getCompressingTime() / 20f) + "s");
-		font.draw(stack, component, 76 - font.width(component) / 2, 50, 16777215);
+		guiGraphics.drawString(font, component, 76 - font.width(component) / 2, 50, 16777215, false);
 	}
 
 	public static class MatterTooltip implements IRecipeSlotTooltipCallback {
