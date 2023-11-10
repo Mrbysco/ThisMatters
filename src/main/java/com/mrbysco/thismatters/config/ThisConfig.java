@@ -2,15 +2,15 @@ package com.mrbysco.thismatters.config;
 
 import com.mrbysco.thismatters.ThisMatters;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.IntValue;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class ThisConfig {
 	public static class Common {
-		public final IntValue minY;
-		public final IntValue maxMatter;
+		public final ForgeConfigSpec.IntValue minY;
+		public final ForgeConfigSpec.IntValue maxMatter;
+		public final ForgeConfigSpec.BooleanValue useDefaults;
 
 		Common(ForgeConfigSpec.Builder builder) {
 			builder.comment("General settings")
@@ -23,6 +23,10 @@ public class ThisConfig {
 			maxMatter = builder
 					.comment("Defines the maximum amount of matter until the Matter Compressor displays 100% [default: 150]")
 					.defineInRange("maxMatter", 150, Integer.MIN_VALUE, Integer.MAX_VALUE);
+
+			useDefaults = builder
+					.comment("Use built-in matter checks when no item match is found using recipes [default: true]")
+					.define("useDefaults", true);
 
 			builder.pop();
 		}
