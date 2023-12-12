@@ -3,11 +3,13 @@ package com.mrbysco.thismatters.util;
 import com.mrbysco.thismatters.config.ThisConfig;
 import com.mrbysco.thismatters.recipe.MatterRecipe;
 import com.mrbysco.thismatters.registry.ThisRecipes;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CactusBlock;
@@ -18,7 +20,6 @@ import net.minecraft.world.level.block.StemGrownBlock;
 import net.minecraft.world.level.block.TallGrassBlock;
 import net.minecraft.world.level.block.WebBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,9 +34,11 @@ public class MatterUtil {
 
 	public static void reloadMatterList(Level level) {
 		if (level != null) {
-			final List<MatterRecipe> matterRecipeList = level.getRecipeManager().getAllRecipesFor(ThisRecipes.MATTER_RECIPE_TYPE.get());
+			final List<RecipeHolder<MatterRecipe>> matterRecipeHolderList = level.getRecipeManager().getAllRecipesFor(ThisRecipes.MATTER_RECIPE_TYPE.get());
 			Map<Integer, List<ItemStack>> matterMap = new HashMap<>();
-			for (MatterRecipe matterRecipe : matterRecipeList) {
+			for (RecipeHolder<MatterRecipe> matterRecipeHolder : matterRecipeHolderList) {
+				if (matterRecipeHolder == null) continue;
+				MatterRecipe matterRecipe = matterRecipeHolder.value();
 				List<ItemStack> ingredientList = matterMap.getOrDefault(matterRecipe.getMatterAmount(), new ArrayList<>());
 				for (Ingredient ingredient : matterRecipe.getIngredients()) {
 					ingredientList.addAll(Arrays.asList(ingredient.getItems()));
@@ -46,7 +49,8 @@ public class MatterUtil {
 			}
 
 			if (ThisConfig.COMMON.useDefaults.get()) {
-				for (Item item : ForgeRegistries.ITEMS.getValues()) {
+				var itemList = BuiltInRegistries.ITEM.stream().toList();
+				for (Item item : itemList) {
 					if (item instanceof BlockItem blockItem) {
 						int defaultValue = getDefaultValue(blockItem);
 

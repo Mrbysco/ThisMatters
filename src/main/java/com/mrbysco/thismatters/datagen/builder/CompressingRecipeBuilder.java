@@ -3,28 +3,30 @@ package com.mrbysco.thismatters.datagen.builder;
 import com.google.gson.JsonObject;
 import com.mrbysco.thismatters.registry.ThisRecipes;
 import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.advancements.AdvancementRequirements;
 import net.minecraft.advancements.AdvancementRewards;
-import net.minecraft.advancements.CriterionTriggerInstance;
-import net.minecraft.advancements.RequirementsStrategy;
+import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeBuilder;
-import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
-import java.util.function.Consumer;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class CompressingRecipeBuilder implements RecipeBuilder {
 	private final Item result;
 	private final Ingredient ingredient;
 	private final int compressingTime;
-	private final Advancement.Builder advancement = Advancement.Builder.advancement();
+	private final Map<String, Criterion<?>> criteria = new LinkedHashMap<>();
 	@Nullable
 	private String group;
 
@@ -38,8 +40,8 @@ public class CompressingRecipeBuilder implements RecipeBuilder {
 		return new CompressingRecipeBuilder(result, input, compressingTime);
 	}
 
-	public CompressingRecipeBuilder unlockedBy(String id, CriterionTriggerInstance triggerInstance) {
-		this.advancement.addCriterion(id, triggerInstance);
+	public CompressingRecipeBuilder unlockedBy(String id, Criterion<?> criterion) {
+		this.criteria.put(id, criterion);
 		return this;
 	}
 
@@ -52,17 +54,20 @@ public class CompressingRecipeBuilder implements RecipeBuilder {
 		return this.result;
 	}
 
-	public void save(Consumer<FinishedRecipe> recipeConsumer, ResourceLocation location) {
+	public void save(RecipeOutput recipeConsumer, ResourceLocation location) {
 		this.ensureValid(location);
-		this.advancement.parent(new ResourceLocation("recipes/root")).addCriterion("has_the_recipe",
-				RecipeUnlockedTrigger.unlocked(location)).rewards(AdvancementRewards.Builder.recipe(location)).requirements(RequirementsStrategy.OR);
+		Advancement.Builder advancement$builder = recipeConsumer.advancement()
+				.addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(location))
+				.rewards(AdvancementRewards.Builder.recipe(location))
+				.requirements(AdvancementRequirements.Strategy.OR);
+		this.criteria.forEach(advancement$builder::addCriterion);
 		recipeConsumer.accept(new CompressingRecipeBuilder.Result(location, this.group == null ? "" : this.group,
 				this.ingredient, this.result, this.compressingTime,
-				this.advancement, new ResourceLocation(location.getNamespace(), "recipes/" + RecipeCategory.MISC.getFolderName() + "/" + location.getPath())));
+				advancement$builder.build(location.withPrefix("recipes/misc/"))));
 	}
 
 	private void ensureValid(ResourceLocation location) {
-		if (this.advancement.getCriteria().isEmpty()) {
+		if (this.criteria.isEmpty()) {
 			throw new IllegalStateException("No way of obtaining recipe " + location);
 		}
 	}
@@ -73,17 +78,15 @@ public class CompressingRecipeBuilder implements RecipeBuilder {
 		private final Ingredient ingredient;
 		private final Item result;
 		private final int compressingTime;
-		private final Advancement.Builder advancement;
-		private final ResourceLocation advancementId;
+		private final AdvancementHolder advancement;
 
-		public Result(ResourceLocation id, String group, Ingredient input, Item result, int compressingTime, Advancement.Builder advancement, ResourceLocation advancementID) {
+		public Result(ResourceLocation id, String group, Ingredient input, Item result, int compressingTime, AdvancementHolder advancement) {
 			this.id = id;
 			this.group = group;
 			this.ingredient = input;
 			this.result = result;
 			this.compressingTime = compressingTime;
 			this.advancement = advancement;
-			this.advancementId = advancementID;
 		}
 
 		public void serializeRecipeData(JsonObject jsonObject) {
@@ -91,27 +94,25 @@ public class CompressingRecipeBuilder implements RecipeBuilder {
 				jsonObject.addProperty("group", this.group);
 			}
 
-			jsonObject.add("ingredient", this.ingredient.toJson());
-			jsonObject.addProperty("result", ForgeRegistries.ITEMS.getKey(this.result).toString());
+			jsonObject.add("ingredient", this.ingredient.toJson(false));
+			JsonObject resultObject = new JsonObject();
+			resultObject.addProperty("item", BuiltInRegistries.ITEM.getKey(this.result).toString());
+
+			jsonObject.add("result", resultObject);
 			jsonObject.addProperty("compressingtime", this.compressingTime);
 		}
 
-		public RecipeSerializer<?> getType() {
+		public RecipeSerializer<?> type() {
 			return ThisRecipes.ORGANIC_MATTER_COMPRESSION_SERIALIZER.get();
 		}
 
-		public ResourceLocation getId() {
+		public ResourceLocation id() {
 			return this.id;
 		}
 
 		@Nullable
-		public JsonObject serializeAdvancement() {
-			return this.advancement.serializeToJson();
-		}
-
-		@Nullable
-		public ResourceLocation getAdvancementId() {
-			return this.advancementId;
+		public AdvancementHolder advancement() {
+			return this.advancement;
 		}
 	}
 }

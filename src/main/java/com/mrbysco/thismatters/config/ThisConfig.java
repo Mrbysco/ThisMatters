@@ -1,18 +1,18 @@
 package com.mrbysco.thismatters.config;
 
 import com.mrbysco.thismatters.ThisMatters;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.event.config.ModConfigEvent;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class ThisConfig {
 	public static class Common {
-		public final ForgeConfigSpec.IntValue minY;
-		public final ForgeConfigSpec.IntValue maxMatter;
-		public final ForgeConfigSpec.BooleanValue useDefaults;
+		public final ModConfigSpec.IntValue minY;
+		public final ModConfigSpec.IntValue maxMatter;
+		public final ModConfigSpec.BooleanValue useDefaults;
 
-		Common(ForgeConfigSpec.Builder builder) {
+		Common(ModConfigSpec.Builder builder) {
 			builder.comment("General settings")
 					.push("General");
 
@@ -32,11 +32,11 @@ public class ThisConfig {
 		}
 	}
 
-	public static final ForgeConfigSpec commonSpec;
+	public static final ModConfigSpec commonSpec;
 	public static final Common COMMON;
 
 	static {
-		final Pair<Common, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(Common::new);
+		final Pair<Common, ModConfigSpec> specPair = new ModConfigSpec.Builder().configure(Common::new);
 		commonSpec = specPair.getRight();
 		COMMON = specPair.getLeft();
 	}

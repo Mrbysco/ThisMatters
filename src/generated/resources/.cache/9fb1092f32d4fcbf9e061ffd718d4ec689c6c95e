@@ -1,8 +1,8 @@
-// 1.20.1	2023-06-27T01:32:13.8995792	Recipes
+// 1.20.2	2023-12-12T16:45:53.2135511	Recipes
 e5e613b7d3360ecf7d5d2791ab52bc2341c274f4 data/thismatters/recipes/1_matter.json
 75a9d1e6ac95e2a5312acc8ef9fbfbc1e1460ecc data/thismatters/recipes/2_matter.json
 91457e022dfb70a295b6150e9757a7811e4f757f data/thismatters/recipes/4_matter.json
 e6ce372bad8025b9ad28ee7477672876b1aebf21 data/thismatters/recipes/5_matter.json
 7459054f4194b90052a84695e6c34854b2af0a04 data/thismatters/recipes/8_matter.json
-d19d6ff764501e493aacdf860ae499185e0a498e data/thismatters/recipes/coal_block_from_compressing_coal.json
+499cbe43425369d3e3ea6a557625d36138c71726 data/thismatters/recipes/coal_block_from_compressing_coal.json
 f97ab508bce5c27b4336f3d80039fe01ae5ab5e4 data/thismatters/recipes/organic_matter_compressor.json

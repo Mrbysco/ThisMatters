@@ -4,7 +4,9 @@ import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mrbysco.thismatters.registry.ThisRecipes;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -14,7 +16,6 @@ import net.minecraft.world.level.ItemLike;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class MatterRecipeBuilder implements MatterBuilder {
 	private final ResourceLocation name;
@@ -70,8 +71,8 @@ public class MatterRecipeBuilder implements MatterBuilder {
 		return name;
 	}
 
-	public void save(Consumer<FinishedRecipe> recipeConsumer, ResourceLocation id) {
-		recipeConsumer.accept(new MatterRecipeBuilder.Result(id, this.matterAmount, this.group == null ? "" : this.group, this.ingredients));
+	public void save(RecipeOutput recipeOutput, ResourceLocation id) {
+		recipeOutput.accept(new MatterRecipeBuilder.Result(id, this.matterAmount, this.group == null ? "" : this.group, this.ingredients));
 	}
 
 	public static class Result implements FinishedRecipe {
@@ -95,28 +96,23 @@ public class MatterRecipeBuilder implements MatterBuilder {
 			JsonArray jsonarray = new JsonArray();
 
 			for (Ingredient ingredient : this.ingredients) {
-				jsonarray.add(ingredient.toJson());
+				jsonarray.add(ingredient.toJson(false));
 			}
 
 			jsonObject.add("ingredients", jsonarray);
 			jsonObject.addProperty("matter", this.matterAmount);
 		}
 
-		public RecipeSerializer<?> getType() {
+		public RecipeSerializer<?> type() {
 			return ThisRecipes.MATTER_SERIALIZER.get();
 		}
 
-		public ResourceLocation getId() {
+		public ResourceLocation id() {
 			return this.id;
 		}
 
 		@Nullable
-		public JsonObject serializeAdvancement() {
-			return null;
-		}
-
-		@Nullable
-		public ResourceLocation getAdvancementId() {
+		public AdvancementHolder advancement() {
 			return null;
 		}
 	}

@@ -4,5 +4,7 @@
   "ingredient": {
     "item": "minecraft:coal"
   },
-  "result": "minecraft:coal_block"
+  "result": {
+    "item": "minecraft:coal_block"
+  }
 }

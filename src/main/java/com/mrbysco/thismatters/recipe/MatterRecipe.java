@@ -1,14 +1,13 @@
 package com.mrbysco.thismatters.recipe;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.mrbysco.thismatters.registry.ThisRecipes;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -16,22 +15,21 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
+import org.apache.commons.lang3.NotImplementedException;
 
 import javax.annotation.Nullable;
 
 public class MatterRecipe implements Recipe<Container> {
-	protected final ResourceLocation id;
 	protected final String group;
 	protected final ItemStack result;
 	protected final NonNullList<Ingredient> ingredients;
 	protected final int matterAmount;
 
-	public MatterRecipe(ResourceLocation id, String group, NonNullList<Ingredient> ingredients, int compressingTime) {
-		this.id = id;
+	public MatterRecipe(String group, NonNullList<Ingredient> ingredients, int matterAmount) {
 		this.group = group;
 		this.ingredients = ingredients;
 		this.result = ItemStack.EMPTY;
-		this.matterAmount = compressingTime;
+		this.matterAmount = matterAmount;
 	}
 
 	public boolean matches(Container container, Level level) {
@@ -71,10 +69,6 @@ public class MatterRecipe implements Recipe<Container> {
 		return this.matterAmount;
 	}
 
-	public ResourceLocation getId() {
-		return this.id;
-	}
-
 	@Override
 	public RecipeSerializer<?> getSerializer() {
 		return ThisRecipes.MATTER_SERIALIZER.get();
@@ -90,34 +84,24 @@ public class MatterRecipe implements Recipe<Container> {
 	}
 
 	public static class Serializer implements RecipeSerializer<MatterRecipe> {
+		private static final Codec<MatterRecipe> CODEC = RawMatterRecipe.CODEC.flatXmap(matterRecipe -> {
+			return DataResult.success(new MatterRecipe(
+					matterRecipe.group,
+					matterRecipe.ingredients,
+					matterRecipe.matterAmount
+			));
+		}, recipe -> {
+			throw new NotImplementedException("Serializing MatterRecipe is not implemented yet.");
+		});
+
 		@Override
-		public MatterRecipe fromJson(ResourceLocation recipeId, JsonObject jsonObject) {
-			String s = GsonHelper.getAsString(jsonObject, "group", "");
-			NonNullList<Ingredient> nonnulllist = itemsFromJson(GsonHelper.getAsJsonArray(jsonObject, "ingredients"));
-			if (nonnulllist.isEmpty()) {
-				throw new JsonParseException("No ingredients for shapeless recipe");
-			} else {
-				int matterValue = GsonHelper.getAsInt(jsonObject, "matter", 1);
-				return new MatterRecipe(recipeId, s, nonnulllist, matterValue);
-			}
-		}
-
-		private static NonNullList<Ingredient> itemsFromJson(JsonArray jsonArray) {
-			NonNullList<Ingredient> nonnulllist = NonNullList.create();
-
-			for (int i = 0; i < jsonArray.size(); ++i) {
-				Ingredient ingredient = Ingredient.fromJson(jsonArray.get(i));
-				if (!ingredient.isEmpty()) {
-					nonnulllist.add(ingredient);
-				}
-			}
-
-			return nonnulllist;
+		public Codec<MatterRecipe> codec() {
+			return CODEC;
 		}
 
 		@Nullable
 		@Override
-		public MatterRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
+		public MatterRecipe fromNetwork(FriendlyByteBuf buffer) {
 			String s = buffer.readUtf();
 			int i = buffer.readVarInt();
 			NonNullList<Ingredient> nonnulllist = NonNullList.withSize(i, Ingredient.EMPTY);
@@ -127,7 +111,7 @@ public class MatterRecipe implements Recipe<Container> {
 			}
 
 			int matterValue = buffer.readVarInt();
-			return new MatterRecipe(recipeId, s, nonnulllist, matterValue);
+			return new MatterRecipe(s, nonnulllist, matterValue);
 		}
 
 		@Override
@@ -140,6 +124,34 @@ public class MatterRecipe implements Recipe<Container> {
 			}
 
 			buffer.writeVarInt(recipe.matterAmount);
+		}
+
+		static record RawMatterRecipe(
+				String group, NonNullList<Ingredient> ingredients, int matterAmount
+		) {
+			public static final Codec<RawMatterRecipe> CODEC = RecordCodecBuilder.create(
+					instance -> instance.group(
+									ExtraCodecs.strictOptionalField(Codec.STRING, "group", "").forGetter(recipe -> recipe.group),
+									Ingredient.CODEC_NONEMPTY
+											.listOf()
+											.fieldOf("ingredients")
+											.flatXmap(
+													list -> {
+														Ingredient[] aingredient = list
+																.toArray(Ingredient[]::new); //Forge skip the empty check and immediatly create the array.
+														if (aingredient.length == 0) {
+															return DataResult.error(() -> "No ingredients for shapeless recipe");
+														} else {
+															return DataResult.success(NonNullList.of(Ingredient.EMPTY, aingredient));
+														}
+													},
+													DataResult::success
+											)
+											.forGetter(recipe -> recipe.ingredients),
+									Codec.INT.optionalFieldOf("matter", 1).forGetter(recipe -> recipe.matterAmount)
+							)
+							.apply(instance, RawMatterRecipe::new)
+			);
 		}
 	}
 }

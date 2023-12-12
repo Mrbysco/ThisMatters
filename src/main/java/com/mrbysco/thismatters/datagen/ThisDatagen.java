@@ -13,6 +13,7 @@ import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.tags.ItemTagsProvider;
@@ -27,25 +28,23 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.ValidationContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-import net.minecraftforge.client.model.generators.BlockModelProvider;
-import net.minecraftforge.client.model.generators.BlockStateProvider;
-import net.minecraftforge.client.model.generators.ItemModelProvider;
-import net.minecraftforge.client.model.generators.ModelFile;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.common.data.BlockTagsProvider;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.common.data.LanguageProvider;
-import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.model.generators.BlockModelProvider;
+import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
+import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
+import net.neoforged.neoforge.client.model.generators.ModelFile;
+import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.common.data.BlockTagsProvider;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.neoforged.neoforge.common.data.LanguageProvider;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ThisDatagen {
@@ -58,7 +57,7 @@ public class ThisDatagen {
 
 		if (event.includeServer()) {
 			generator.addProvider(event.includeServer(), new Loots(packOutput));
-			generator.addProvider(event.includeServer(), new Recipes(packOutput));
+			generator.addProvider(event.includeServer(), new Recipes(packOutput, lookupProvider));
 			BlockTagsProvider provider;
 			generator.addProvider(event.includeServer(), provider = new ThisBlockTags(packOutput, lookupProvider, helper));
 			generator.addProvider(event.includeServer(), new ThisItemTags(packOutput, lookupProvider, provider, helper));
@@ -91,7 +90,7 @@ public class ThisDatagen {
 
 			@Override
 			protected Iterable<Block> getKnownBlocks() {
-				return ThisRegistry.BLOCKS.getEntries().stream().map(RegistryObject::get)::iterator;
+				return ThisRegistry.BLOCKS.getEntries().stream().map(holder -> (Block) holder.get())::iterator;
 			}
 		}
 
@@ -103,19 +102,19 @@ public class ThisDatagen {
 
 	public static class Recipes extends RecipeProvider {
 
-		public Recipes(PackOutput packOutput) {
-			super(packOutput);
+		public Recipes(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+			super(packOutput, lookupProvider);
 		}
 
 		@Override
-		protected void buildRecipes(Consumer<FinishedRecipe> recipeConsumer) {
+		protected void buildRecipes(RecipeOutput recipeOutput) {
 			MatterRecipeBuilder.matter(new ResourceLocation(ThisMatters.MOD_ID, "1_matter"), 1)
 					.requires(Tags.Items.RODS_WOODEN).requires(Items.BAMBOO).requires(ItemTags.LEAVES)
 					.requires(Items.DEAD_BRAIN_CORAL).requires(Items.DEAD_BUBBLE_CORAL).requires(Items.DEAD_FIRE_CORAL)
 					.requires(Items.DEAD_HORN_CORAL).requires(Items.DEAD_TUBE_CORAL).requires(Items.DEAD_TUBE_CORAL_FAN)
 					.requires(Items.DEAD_BRAIN_CORAL_FAN).requires(Items.DEAD_BUBBLE_CORAL_FAN).requires(Items.DEAD_FIRE_CORAL_FAN)
 					.requires(Items.DEAD_HORN_CORAL_FAN)
-					.save(recipeConsumer);
+					.save(recipeOutput);
 
 			MatterRecipeBuilder.matter(new ResourceLocation(ThisMatters.MOD_ID, "2_matter"), 2)
 					.requires(Items.WOODEN_SWORD).requires(Items.WOODEN_HOE).requires(Items.WOODEN_AXE)
@@ -136,7 +135,7 @@ public class ThisDatagen {
 					.requires(Items.BRAIN_CORAL_FAN).requires(Items.BUBBLE_CORAL_FAN).requires(Items.FIRE_CORAL_FAN)
 					.requires(Items.HORN_CORAL_FAN).requires(Items.DEAD_TUBE_CORAL_BLOCK).requires(Items.DEAD_BRAIN_CORAL_BLOCK)
 					.requires(Items.DEAD_BUBBLE_CORAL_BLOCK).requires(Items.DEAD_FIRE_CORAL_BLOCK).requires(Items.DEAD_HORN_CORAL_BLOCK)
-					.requires(ItemTags.WOODEN_PRESSURE_PLATES).requires(ItemTags.SAPLINGS).save(recipeConsumer);
+					.requires(ItemTags.WOODEN_PRESSURE_PLATES).requires(ItemTags.SAPLINGS).save(recipeOutput);
 
 			MatterRecipeBuilder.matter(new ResourceLocation(ThisMatters.MOD_ID, "4_matter"), 4)
 					.requires(ItemTags.PLANKS).requires(Items.MUSIC_DISC_13).requires(Items.MUSIC_DISC_CAT)
@@ -145,24 +144,24 @@ public class ThisDatagen {
 					.requires(Items.MUSIC_DISC_STRAD).requires(Items.MUSIC_DISC_WARD).requires(Items.MUSIC_DISC_11)
 					.requires(Items.MUSIC_DISC_WAIT).requires(Items.MUSIC_DISC_OTHERSIDE).requires(Items.MUSIC_DISC_PIGSTEP)
 					.requires(Items.TUBE_CORAL_BLOCK).requires(Items.BRAIN_CORAL_BLOCK).requires(Items.BUBBLE_CORAL_BLOCK)
-					.requires(Items.FIRE_CORAL_BLOCK).requires(Items.HORN_CORAL_BLOCK).save(recipeConsumer);
+					.requires(Items.FIRE_CORAL_BLOCK).requires(Items.HORN_CORAL_BLOCK).save(recipeOutput);
 
 			MatterRecipeBuilder.matter(new ResourceLocation(ThisMatters.MOD_ID, "5_matter"), 5)
-					.requires(ItemTags.WARPED_STEMS).save(recipeConsumer);
+					.requires(ItemTags.WARPED_STEMS).save(recipeOutput);
 
 			MatterRecipeBuilder.matter(new ResourceLocation(ThisMatters.MOD_ID, "8_matter"), 8)
-					.requires(Tags.Items.HEADS).save(recipeConsumer);
+					.requires(Tags.Items.HEADS).save(recipeOutput);
 
 			ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, ThisRegistry.ORGANIC_MATTER_COMPRESSOR.get())
 					.define('E', Tags.Items.GEMS_EMERALD)
 					.define('O', Tags.Items.OBSIDIAN)
 					.define('C', Items.CAULDRON)
 					.define('I', Tags.Items.STORAGE_BLOCKS_IRON)
-					.pattern("EOE").pattern("OCO").pattern("OIO").unlockedBy("has_obsidian", has(Blocks.OBSIDIAN)).save(recipeConsumer);
+					.pattern("EOE").pattern("OCO").pattern("OIO").unlockedBy("has_obsidian", has(Blocks.OBSIDIAN)).save(recipeOutput);
 
 			CompressingRecipeBuilder.compressing(Ingredient.of(Items.COAL), Items.COAL_BLOCK, 900)
 					.unlockedBy("has_coal", has(Items.COAL))
-					.save(recipeConsumer, new ResourceLocation(ThisMatters.MOD_ID, "coal_block_from_compressing_coal"));
+					.save(recipeOutput, new ResourceLocation(ThisMatters.MOD_ID, "coal_block_from_compressing_coal"));
 		}
 
 		@Override

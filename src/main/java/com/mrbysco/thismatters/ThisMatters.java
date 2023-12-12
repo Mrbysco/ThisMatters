@@ -5,13 +5,12 @@ import com.mrbysco.thismatters.config.ThisConfig;
 import com.mrbysco.thismatters.registry.ThisMenus;
 import com.mrbysco.thismatters.registry.ThisRecipes;
 import com.mrbysco.thismatters.registry.ThisRegistry;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig.Type;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig.Type;
+import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.fml.loading.FMLEnvironment;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -33,8 +32,8 @@ public class ThisMatters {
 		ThisRecipes.RECIPE_SERIALIZERS.register(eventBus);
 		ThisMenus.MENU_TYPES.register(eventBus);
 
-		DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+		if (FMLEnvironment.dist.isClient()) {
 			eventBus.addListener(ClientHandler::onClientSetup);
-		});
+		}
 	}
 }
