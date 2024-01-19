@@ -67,10 +67,12 @@ repositories {
 dependencies {
     implementation "net.neoforged:neoforge:${neo_version}"
 
-//    compileOnly "mezz.jei:jei-${mc_version}-common-api:${jei_version}"
-//    compileOnly "mezz.jei:jei-${mc_version}-forge-api:${jei_version}"
-//
-//    runtimeOnly "mezz.jei:jei-${mc_version}-forge:${jei_version}"
+    compileOnly "mezz.jei:jei-${mc_version}-common-api:${jei_version}"
+    compileOnly "mezz.jei:jei-${mc_version}-neoforge-api:${jei_version}"
+
+    runtimeOnly "mezz.jei:jei-${mc_version}-neoforge:${jei_version}"
+
+    compileOnly "com.blamejared.crafttweaker:CraftTweaker-common-${mc_version}:${crafttweaker_version}"
 }
 
 jar {
@@ -122,8 +124,7 @@ if (System.getenv().CURSEFORGE_KEY) {
         mainFile.changelog = file("$project.rootDir/changelog.md")
         mainFile.changelogType = 'markdown'
 
-//        mainFile.addRequirement()
-//        mainFile.addOptional("jei", "crafttweaker")
+        mainFile.addOptional("jei", "crafttweaker")
     }
 }
 
@@ -139,10 +140,10 @@ if (System.getenv().MODRINTH_KEY) {
         gameVersions = ["${mc_version}"]
         loaders = ["neoforge"]
 
-//        dependencies {
-//            optional.project "jei"
-//            optional.project "crafttweaker"
-//        }
+        dependencies {
+            optional.project "jei"
+            optional.project "crafttweaker"
+        }
     }
 }
 

@@ -9,7 +9,6 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig.Type;
-import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.neoforged.fml.loading.FMLEnvironment;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,10 +18,11 @@ public class ThisMatters {
 	public static final String MOD_ID = "thismatters";
 	public static final Logger LOGGER = LogManager.getLogger();
 
-	public ThisMatters() {
-		IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
+	public ThisMatters(IEventBus eventBus) {
 		ModLoadingContext.get().registerConfig(Type.COMMON, ThisConfig.commonSpec);
 		eventBus.register(ThisConfig.class);
+
+		eventBus.addListener(ThisRegistry::registerCapabilities);
 
 		ThisRegistry.BLOCKS.register(eventBus);
 		ThisRegistry.BLOCK_ENTITY_TYPES.register(eventBus);
@@ -33,7 +33,7 @@ public class ThisMatters {
 		ThisMenus.MENU_TYPES.register(eventBus);
 
 		if (FMLEnvironment.dist.isClient()) {
-			eventBus.addListener(ClientHandler::onClientSetup);
+			eventBus.addListener(ClientHandler::onRegisterMenu);
 		}
 	}
 }

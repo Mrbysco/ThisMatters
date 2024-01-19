@@ -1,5 +1,6 @@
 package com.mrbysco.thismatters.block;
 
+import com.mojang.serialization.MapCodec;
 import com.mrbysco.thismatters.blockentity.OrganicMatterCompressorBlockEntity;
 import com.mrbysco.thismatters.config.ThisConfig;
 import com.mrbysco.thismatters.registry.ThisRegistry;
@@ -7,7 +8,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
@@ -24,13 +24,19 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.neoforge.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 
 public class OrganicMatterCompressorBlock extends BaseEntityBlock {
+	public static final MapCodec<OrganicMatterCompressorBlock> CODEC = simpleCodec(OrganicMatterCompressorBlock::new);
+
 	public OrganicMatterCompressorBlock(Properties properties) {
 		super(properties);
+	}
+
+	@Override
+	protected MapCodec<? extends BaseEntityBlock> codec() {
+		return CODEC;
 	}
 
 	@Override
@@ -44,7 +50,7 @@ public class OrganicMatterCompressorBlock extends BaseEntityBlock {
 					int minY = Mth.clamp(ThisConfig.COMMON.minY.get(), level.getMinBuildHeight(), level.getMaxBuildHeight());
 					boolean flag2 = pos.getY() <= minY;
 					if (flag2) {
-						NetworkHooks.openScreen((ServerPlayer) player, compressorBE, pos);
+						player.openMenu(compressorBE, pos);
 					} else {
 						player.displayClientMessage(Component.translatable("thismatters.organic_matter_compressor.not_low_enough").withStyle(ChatFormatting.RED), true);
 					}

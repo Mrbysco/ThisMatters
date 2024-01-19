@@ -15,7 +15,6 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import org.apache.commons.lang3.NotImplementedException;
 
 import javax.annotation.Nullable;
 
@@ -84,15 +83,29 @@ public class MatterRecipe implements Recipe<Container> {
 	}
 
 	public static class Serializer implements RecipeSerializer<MatterRecipe> {
-		private static final Codec<MatterRecipe> CODEC = RawMatterRecipe.CODEC.flatXmap(matterRecipe -> {
-			return DataResult.success(new MatterRecipe(
-					matterRecipe.group,
-					matterRecipe.ingredients,
-					matterRecipe.matterAmount
-			));
-		}, recipe -> {
-			throw new NotImplementedException("Serializing MatterRecipe is not implemented yet.");
-		});
+		public static final Codec<MatterRecipe> CODEC = RecordCodecBuilder.create(
+				instance -> instance.group(
+								ExtraCodecs.strictOptionalField(Codec.STRING, "group", "").forGetter(recipe -> recipe.group),
+								Ingredient.CODEC_NONEMPTY
+										.listOf()
+										.fieldOf("ingredients")
+										.flatXmap(
+												list -> {
+													Ingredient[] aingredient = list
+															.toArray(Ingredient[]::new); //Forge skip the empty check and immediatly create the array.
+													if (aingredient.length == 0) {
+														return DataResult.error(() -> "No ingredients for shapeless recipe");
+													} else {
+														return DataResult.success(NonNullList.of(Ingredient.EMPTY, aingredient));
+													}
+												},
+												DataResult::success
+										)
+										.forGetter(recipe -> recipe.ingredients),
+								Codec.INT.optionalFieldOf("matter", 1).forGetter(recipe -> recipe.matterAmount)
+						)
+						.apply(instance, MatterRecipe::new)
+		);
 
 		@Override
 		public Codec<MatterRecipe> codec() {
@@ -124,34 +137,6 @@ public class MatterRecipe implements Recipe<Container> {
 			}
 
 			buffer.writeVarInt(recipe.matterAmount);
-		}
-
-		static record RawMatterRecipe(
-				String group, NonNullList<Ingredient> ingredients, int matterAmount
-		) {
-			public static final Codec<RawMatterRecipe> CODEC = RecordCodecBuilder.create(
-					instance -> instance.group(
-									ExtraCodecs.strictOptionalField(Codec.STRING, "group", "").forGetter(recipe -> recipe.group),
-									Ingredient.CODEC_NONEMPTY
-											.listOf()
-											.fieldOf("ingredients")
-											.flatXmap(
-													list -> {
-														Ingredient[] aingredient = list
-																.toArray(Ingredient[]::new); //Forge skip the empty check and immediatly create the array.
-														if (aingredient.length == 0) {
-															return DataResult.error(() -> "No ingredients for shapeless recipe");
-														} else {
-															return DataResult.success(NonNullList.of(Ingredient.EMPTY, aingredient));
-														}
-													},
-													DataResult::success
-											)
-											.forGetter(recipe -> recipe.ingredients),
-									Codec.INT.optionalFieldOf("matter", 1).forGetter(recipe -> recipe.matterAmount)
-							)
-							.apply(instance, RawMatterRecipe::new)
-			);
 		}
 	}
 }

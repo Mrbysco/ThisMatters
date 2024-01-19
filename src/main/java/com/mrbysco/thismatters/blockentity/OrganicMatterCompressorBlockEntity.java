@@ -34,9 +34,6 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
-import net.neoforged.neoforge.common.capabilities.Capability;
-import net.neoforged.neoforge.common.util.LazyOptional;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
@@ -54,7 +51,6 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 			return getMatterValue(level, stack) > 0;
 		}
 	};
-	private LazyOptional<IItemHandler> matterHolder = LazyOptional.of(() -> matterHandler);
 	public final ItemStackHandler inputHandler = new ItemStackHandler(1) {
 		@Override
 		public boolean isItemValid(int slot, @NotNull ItemStack stack) {
@@ -69,14 +65,12 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 			setChanged();
 		}
 	};
-	private LazyOptional<IItemHandler> inputHolder = LazyOptional.of(() -> inputHandler);
 	public final ItemStackHandler resultHandler = new ItemStackHandler(1) {
 		@Override
 		public boolean isItemValid(int slot, @NotNull ItemStack stack) {
 			return false;
 		}
 	};
-	private LazyOptional<IItemHandler> resultHolder = LazyOptional.of(() -> resultHandler);
 
 	protected final ContainerData dataAccess = new ContainerData() {
 		public int get(int index) {
@@ -469,33 +463,13 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 		return nbt;
 	}
 
-	@Override
-	public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-		if (cap == Capabilities.ITEM_HANDLER) {
-			if (side == Direction.UP) {
-				return inputHolder.cast();
-			} else if (side == Direction.DOWN) {
-				return resultHolder.cast();
-			} else {
-				return matterHolder.cast();
-			}
+	public IItemHandler getHandler(@Nullable Direction side) {
+		if (side == Direction.UP) {
+			return inputHandler;
+		} else if (side == Direction.DOWN) {
+			return resultHandler;
+		} else {
+			return matterHandler;
 		}
-		return super.getCapability(cap, side);
-	}
-
-	@Override
-	public void invalidateCaps() {
-		super.invalidateCaps();
-		this.matterHolder.invalidate();
-		this.inputHolder.invalidate();
-		this.resultHolder.invalidate();
-	}
-
-	@Override
-	public void reviveCaps() {
-		super.reviveCaps();
-		this.matterHolder = LazyOptional.of(() -> matterHandler);
-		this.inputHolder = LazyOptional.of(() -> inputHandler);
-		this.resultHolder = LazyOptional.of(() -> inputHandler);
 	}
 }

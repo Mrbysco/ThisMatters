@@ -1,26 +1,23 @@
 package com.mrbysco.thismatters.datagen.builder;
 
-import com.google.common.collect.Lists;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.mrbysco.thismatters.registry.ThisRecipes;
-import net.minecraft.advancements.AdvancementHolder;
-import net.minecraft.data.recipes.FinishedRecipe;
+import com.mrbysco.thismatters.recipe.MatterRecipe;
+import net.minecraft.advancements.Criterion;
+import net.minecraft.core.NonNullList;
+import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
 
 import javax.annotation.Nullable;
-import java.util.List;
 
-public class MatterRecipeBuilder implements MatterBuilder {
+public class MatterRecipeBuilder implements RecipeBuilder {
 	private final ResourceLocation name;
 	private final int matterAmount;
-	private final List<Ingredient> ingredients = Lists.newArrayList();
+	private final NonNullList<Ingredient> ingredients = NonNullList.create();
 	@Nullable
 	private String group;
 
@@ -61,59 +58,24 @@ public class MatterRecipeBuilder implements MatterBuilder {
 		return this;
 	}
 
+	@Override
+	public RecipeBuilder unlockedBy(String id, Criterion<?> criterion) {
+		return null;
+	}
+
+	@Override
+	public Item getResult() {
+		return Items.AIR;
+	}
+
 	public MatterRecipeBuilder group(@Nullable String group) {
 		this.group = group;
 		return this;
 	}
 
-	@Override
-	public ResourceLocation getName() {
-		return name;
-	}
-
 	public void save(RecipeOutput recipeOutput, ResourceLocation id) {
-		recipeOutput.accept(new MatterRecipeBuilder.Result(id, this.matterAmount, this.group == null ? "" : this.group, this.ingredients));
-	}
-
-	public static class Result implements FinishedRecipe {
-		private final ResourceLocation id;
-		private final int matterAmount;
-		private final String group;
-		private final List<Ingredient> ingredients;
-
-		public Result(ResourceLocation id, int matterAmount, String group, List<Ingredient> ingredients) {
-			this.id = id;
-			this.matterAmount = matterAmount;
-			this.group = group;
-			this.ingredients = ingredients;
-		}
-
-		public void serializeRecipeData(JsonObject jsonObject) {
-			if (!this.group.isEmpty()) {
-				jsonObject.addProperty("group", this.group);
-			}
-
-			JsonArray jsonarray = new JsonArray();
-
-			for (Ingredient ingredient : this.ingredients) {
-				jsonarray.add(ingredient.toJson(false));
-			}
-
-			jsonObject.add("ingredients", jsonarray);
-			jsonObject.addProperty("matter", this.matterAmount);
-		}
-
-		public RecipeSerializer<?> type() {
-			return ThisRecipes.MATTER_SERIALIZER.get();
-		}
-
-		public ResourceLocation id() {
-			return this.id;
-		}
-
-		@Nullable
-		public AdvancementHolder advancement() {
-			return null;
-		}
+		MatterRecipe recipe = new MatterRecipe(this.group == null ? "" : this.group, this.ingredients, matterAmount);
+		ResourceLocation usedID = name.equals(id) ? id : name;
+		recipeOutput.accept(usedID, recipe, null);
 	}
 }

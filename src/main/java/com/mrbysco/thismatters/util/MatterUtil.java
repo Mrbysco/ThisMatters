@@ -11,12 +11,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.AttachedStemBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CactusBlock;
 import net.minecraft.world.level.block.CakeBlock;
 import net.minecraft.world.level.block.CarvedPumpkinBlock;
 import net.minecraft.world.level.block.SeagrassBlock;
-import net.minecraft.world.level.block.StemGrownBlock;
+import net.minecraft.world.level.block.StemBlock;
 import net.minecraft.world.level.block.TallGrassBlock;
 import net.minecraft.world.level.block.WebBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -83,7 +84,7 @@ public class MatterUtil {
 		if (state.is(BlockTags.WARPED_STEMS)) {
 			defaultValue = 5;
 		} else if (block instanceof CactusBlock || block instanceof TallGrassBlock || state.is(BlockTags.LOGS) || state.is(BlockTags.PLANKS) ||
-				block instanceof StemGrownBlock || block instanceof CarvedPumpkinBlock) {
+				block instanceof StemBlock || block instanceof AttachedStemBlock || block instanceof CarvedPumpkinBlock) {
 			defaultValue = 4;
 		} else if (state.is(BlockTags.LEAVES) || state.is(BlockTags.CROPS) || state.is(BlockTags.REPLACEABLE_BY_TREES) ||
 				block instanceof SeagrassBlock || block instanceof WebBlock || state.is(BlockTags.WOOL) || block instanceof CakeBlock) {

@@ -1,7 +1,6 @@
 package com.mrbysco.thismatters.recipe;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.mrbysco.thismatters.registry.ThisRecipes;
 import net.minecraft.core.NonNullList;
@@ -10,13 +9,11 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingRecipeCodecs;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import org.apache.commons.lang3.NotImplementedException;
 
 import javax.annotation.Nullable;
 
@@ -84,16 +81,15 @@ public class CompressingRecipe implements Recipe<Container> {
 	}
 
 	public static class Serializer implements RecipeSerializer<CompressingRecipe> {
-		private static final Codec<CompressingRecipe> CODEC = RawCompressingRecipe.CODEC.flatXmap(compressingRecipe -> {
-			return DataResult.success(new CompressingRecipe(
-					compressingRecipe.group,
-					compressingRecipe.ingredient,
-					compressingRecipe.resultStack,
-					compressingRecipe.compressingTime
-			));
-		}, recipe -> {
-			throw new NotImplementedException("Serializing CompressingRecipe is not implemented yet.");
-		});
+		public static final Codec<CompressingRecipe> CODEC = RecordCodecBuilder.create(
+				instance -> instance.group(
+								ExtraCodecs.strictOptionalField(Codec.STRING, "group", "").forGetter(recipe -> recipe.group),
+								Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(recipe -> recipe.ingredient),
+								ItemStack.SINGLE_ITEM_CODEC.fieldOf("result").forGetter(recipe -> recipe.result),
+								Codec.INT.optionalFieldOf("compressingtime", 900).forGetter(recipe -> recipe.compressingTime)
+						)
+						.apply(instance, CompressingRecipe::new)
+		);
 
 		@Override
 		public Codec<CompressingRecipe> codec() {
@@ -116,20 +112,6 @@ public class CompressingRecipe implements Recipe<Container> {
 			recipe.ingredient.toNetwork(buffer);
 			buffer.writeItem(recipe.result);
 			buffer.writeVarInt(recipe.compressingTime);
-		}
-
-		static record RawCompressingRecipe(
-				String group, Ingredient ingredient, ItemStack resultStack, int compressingTime
-		) {
-			public static final Codec<RawCompressingRecipe> CODEC = RecordCodecBuilder.create(
-					instance -> instance.group(
-									ExtraCodecs.strictOptionalField(Codec.STRING, "group", "").forGetter(recipe -> recipe.group),
-									Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(recipe -> recipe.ingredient),
-									CraftingRecipeCodecs.ITEMSTACK_OBJECT_CODEC.fieldOf("result").forGetter(recipe -> recipe.resultStack),
-									Codec.INT.optionalFieldOf("compressingtime", 900).forGetter(recipe -> recipe.compressingTime)
-							)
-							.apply(instance, RawCompressingRecipe::new)
-			);
 		}
 	}
 }

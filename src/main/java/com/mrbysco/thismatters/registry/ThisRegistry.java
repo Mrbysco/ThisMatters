@@ -13,6 +13,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.MapColor;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -43,4 +45,8 @@ public class ThisRegistry {
 				List<ItemStack> stacks = ThisRegistry.ITEMS.getEntries().stream().map(reg -> new ItemStack(reg.get())).toList();
 				output.acceptAll(stacks);
 			}).build());
+
+	public static void registerCapabilities(RegisterCapabilitiesEvent event) {
+		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ORGANIC_MATTER_COMPRESSOR_BE.get(), OrganicMatterCompressorBlockEntity::getHandler);
+	}
 }

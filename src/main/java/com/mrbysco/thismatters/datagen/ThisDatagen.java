@@ -1,17 +1,14 @@
 package com.mrbysco.thismatters.datagen;
 
-import com.google.gson.JsonObject;
 import com.mrbysco.thismatters.ThisMatters;
 import com.mrbysco.thismatters.datagen.builder.CompressingRecipeBuilder;
 import com.mrbysco.thismatters.datagen.builder.MatterRecipeBuilder;
 import com.mrbysco.thismatters.registry.ThisRegistry;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.LootTableProvider;
-import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
@@ -162,11 +159,6 @@ public class ThisDatagen {
 			CompressingRecipeBuilder.compressing(Ingredient.of(Items.COAL), Items.COAL_BLOCK, 900)
 					.unlockedBy("has_coal", has(Items.COAL))
 					.save(recipeOutput, new ResourceLocation(ThisMatters.MOD_ID, "coal_block_from_compressing_coal"));
-		}
-
-		@Override
-		protected @Nullable CompletableFuture<?> saveAdvancement(CachedOutput output, FinishedRecipe finishedRecipe, JsonObject advancementJson) {
-			return null;
 		}
 	}
 
