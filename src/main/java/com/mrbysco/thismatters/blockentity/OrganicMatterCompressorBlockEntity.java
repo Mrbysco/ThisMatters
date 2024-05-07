@@ -11,6 +11,9 @@ import com.mrbysco.thismatters.util.MatterUtil;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
+import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
@@ -113,11 +116,12 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 		this.quickCheck = RecipeManager.createCheck((RecipeType<CompressingRecipe>) ThisRecipes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE.get());
 	}
 
-	public void load(CompoundTag tag) {
-		super.load(tag);
-		this.matterHandler.deserializeNBT(tag.getCompound("MatterStackHandler"));
-		this.inputHandler.deserializeNBT(tag.getCompound("InputStackHandler"));
-		this.resultHandler.deserializeNBT(tag.getCompound("ResultStackHandler"));
+	@Override
+	public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.loadAdditional(tag, registries);
+		this.matterHandler.deserializeNBT(registries, tag.getCompound("MatterStackHandler"));
+		this.inputHandler.deserializeNBT(registries, tag.getCompound("InputStackHandler"));
+		this.resultHandler.deserializeNBT(registries, tag.getCompound("ResultStackHandler"));
 
 		this.matterAmount = tag.getInt("MatterAmount");
 		this.maxMatter = tag.getInt("MaxMatter");
@@ -130,16 +134,17 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 		}
 	}
 
-	protected void saveAdditional(CompoundTag tag) {
-		super.saveAdditional(tag);
+	@Override
+	protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.saveAdditional(tag, registries);
 		tag.putFloat("MatterAmount", this.matterAmount);
 		tag.putFloat("MaxMatter", this.maxMatter);
 		tag.putInt("CompressingTime", this.compressingProgress);
 		tag.putInt("CompressingTotalTime", this.compressingTotalTime);
 
-		tag.put("MatterStackHandler", matterHandler.serializeNBT());
-		tag.put("InputStackHandler", inputHandler.serializeNBT());
-		tag.put("ResultStackHandler", resultHandler.serializeNBT());
+		tag.put("MatterStackHandler", matterHandler.serializeNBT(registries));
+		tag.put("InputStackHandler", inputHandler.serializeNBT(registries));
+		tag.put("ResultStackHandler", resultHandler.serializeNBT(registries));
 
 		CompoundTag compoundtag = new CompoundTag();
 		this.recipesUsed.forEach((location, index) -> {
@@ -286,6 +291,16 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 	}
 
 	@Override
+	protected NonNullList<ItemStack> getItems() {
+		return NonNullList.create();
+	}
+
+	@Override
+	protected void setItems(NonNullList<ItemStack> pItems) {
+
+	}
+
+	@Override
 	public boolean isEmpty() {
 		for (int i = 0; i < matterHandler.getSlots(); i++) {
 			if (!matterHandler.getStackInSlot(i).isEmpty()) {
@@ -349,7 +364,7 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 			itemstack = matterHandler.getStackInSlot(slot);
 		}
 
-		boolean flag = !stack.isEmpty() && ItemStack.isSameItemSameTags(stack, itemstack);
+		boolean flag = !stack.isEmpty() && ItemStack.isSameItemSameComponents(stack, itemstack);
 		if (slot == SLOT_INPUT) {
 			inputHandler.setStackInSlot(0, stack);
 		} else if (slot == SLOT_RESULT) {
@@ -440,26 +455,24 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 	}
 
 	@Override
-	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet) {
-		this.load(packet.getTag());
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+		this.loadAdditional(packet.getTag(), registries);
 	}
 
 	@Override
-	public CompoundTag getUpdateTag() {
-		CompoundTag nbt = new CompoundTag();
-		this.saveAdditional(nbt);
-		return nbt;
+	public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+		return saveCustomOnly(registries);
 	}
 
 	@Override
-	public void handleUpdateTag(CompoundTag tag) {
-		this.load(tag);
+	public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+		this.loadAdditional(tag, registries);
 	}
 
 	@Override
 	public CompoundTag getPersistentData() {
 		CompoundTag nbt = new CompoundTag();
-		this.saveAdditional(nbt);
+		this.saveAdditional(nbt, level != null ? level.registryAccess() : VanillaRegistries.createLookup());
 		return nbt;
 	}
 

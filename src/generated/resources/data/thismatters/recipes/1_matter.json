@@ -2,7 +2,7 @@
   "type": "thismatters:matter_recipe",
   "ingredients": [
     {
-      "tag": "forge:rods/wooden"
+      "tag": "c:rods/wooden"
     },
     {
       "item": "minecraft:bamboo"

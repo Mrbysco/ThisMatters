@@ -2,7 +2,7 @@
   "type": "thismatters:matter_recipe",
   "ingredients": [
     {
-      "tag": "forge:heads"
+      "tag": "minecraft:skulls"
     }
   ],
   "matter": 8

@@ -2,12 +2,13 @@ package com.mrbysco.thismatters.recipe;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.mrbysco.thismatters.registry.ThisRecipes;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.util.ExtraCodecs;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -15,8 +16,6 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-
-import javax.annotation.Nullable;
 
 public class MatterRecipe implements Recipe<Container> {
 	protected final String group;
@@ -43,8 +42,8 @@ public class MatterRecipe implements Recipe<Container> {
 	}
 
 	@Override
-	public ItemStack assemble(Container container, RegistryAccess registryAccess) {
-		return getResultItem(registryAccess).copy();
+	public ItemStack assemble(Container container, HolderLookup.Provider registries) {
+		return getResultItem(registries).copy();
 	}
 
 	public boolean canCraftInDimensions(int width, int height) {
@@ -56,7 +55,7 @@ public class MatterRecipe implements Recipe<Container> {
 	}
 
 	@Override
-	public ItemStack getResultItem(RegistryAccess registryAccess) {
+	public ItemStack getResultItem(HolderLookup.Provider registries) {
 		return this.result;
 	}
 
@@ -83,9 +82,9 @@ public class MatterRecipe implements Recipe<Container> {
 	}
 
 	public static class Serializer implements RecipeSerializer<MatterRecipe> {
-		public static final Codec<MatterRecipe> CODEC = RecordCodecBuilder.create(
+		public static final MapCodec<MatterRecipe> CODEC = RecordCodecBuilder.mapCodec(
 				instance -> instance.group(
-								ExtraCodecs.strictOptionalField(Codec.STRING, "group", "").forGetter(recipe -> recipe.group),
+								Codec.STRING.optionalFieldOf("group", "").forGetter(recipe -> recipe.group),
 								Ingredient.CODEC_NONEMPTY
 										.listOf()
 										.fieldOf("ingredients")
@@ -106,34 +105,36 @@ public class MatterRecipe implements Recipe<Container> {
 						)
 						.apply(instance, MatterRecipe::new)
 		);
+		public static final StreamCodec<RegistryFriendlyByteBuf, MatterRecipe> STREAM_CODEC = StreamCodec.of(
+				MatterRecipe.Serializer::toNetwork, MatterRecipe.Serializer::fromNetwork
+		);
 
 		@Override
-		public Codec<MatterRecipe> codec() {
+		public MapCodec<MatterRecipe> codec() {
 			return CODEC;
 		}
 
-		@Nullable
 		@Override
-		public MatterRecipe fromNetwork(FriendlyByteBuf buffer) {
+		public StreamCodec<RegistryFriendlyByteBuf, MatterRecipe> streamCodec() {
+			return STREAM_CODEC;
+		}
+
+		public static MatterRecipe fromNetwork(RegistryFriendlyByteBuf buffer) {
 			String s = buffer.readUtf();
 			int i = buffer.readVarInt();
 			NonNullList<Ingredient> nonnulllist = NonNullList.withSize(i, Ingredient.EMPTY);
-
-			for (int j = 0; j < nonnulllist.size(); ++j) {
-				nonnulllist.set(j, Ingredient.fromNetwork(buffer));
-			}
+			nonnulllist.replaceAll(ingredient -> Ingredient.CONTENTS_STREAM_CODEC.decode(buffer));
 
 			int matterValue = buffer.readVarInt();
 			return new MatterRecipe(s, nonnulllist, matterValue);
 		}
 
-		@Override
-		public void toNetwork(FriendlyByteBuf buffer, MatterRecipe recipe) {
+		public static void toNetwork(RegistryFriendlyByteBuf buffer, MatterRecipe recipe) {
 			buffer.writeUtf(recipe.group);
 			buffer.writeVarInt(recipe.ingredients.size());
 
 			for (Ingredient ingredient : recipe.ingredients) {
-				ingredient.toNetwork(buffer);
+				Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, ingredient);
 			}
 
 			buffer.writeVarInt(recipe.matterAmount);

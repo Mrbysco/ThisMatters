@@ -3,5 +3,7 @@
   "ingredient": {
     "item": "minecraft:coal"
   },
-  "result": "minecraft:coal_block"
+  "result": {
+    "id": "minecraft:coal_block"
+  }
 }

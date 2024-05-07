@@ -5,11 +5,11 @@ import com.mrbysco.thismatters.config.ThisConfig;
 import com.mrbysco.thismatters.registry.ThisMenus;
 import com.mrbysco.thismatters.registry.ThisRecipes;
 import com.mrbysco.thismatters.registry.ThisRegistry;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig.Type;
-import net.neoforged.fml.loading.FMLEnvironment;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,8 +18,8 @@ public class ThisMatters {
 	public static final String MOD_ID = "thismatters";
 	public static final Logger LOGGER = LogManager.getLogger();
 
-	public ThisMatters(IEventBus eventBus) {
-		ModLoadingContext.get().registerConfig(Type.COMMON, ThisConfig.commonSpec);
+	public ThisMatters(IEventBus eventBus, Dist dist, ModContainer container) {
+		container.registerConfig(Type.COMMON, ThisConfig.commonSpec);
 		eventBus.register(ThisConfig.class);
 
 		eventBus.addListener(ThisRegistry::registerCapabilities);
@@ -32,7 +32,7 @@ public class ThisMatters {
 		ThisRecipes.RECIPE_SERIALIZERS.register(eventBus);
 		ThisMenus.MENU_TYPES.register(eventBus);
 
-		if (FMLEnvironment.dist.isClient()) {
+		if (dist.isClient()) {
 			eventBus.addListener(ClientHandler::onRegisterMenu);
 		}
 	}

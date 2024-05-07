@@ -1,12 +1,13 @@
 package com.mrbysco.thismatters.recipe;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.mrbysco.thismatters.registry.ThisRecipes;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.util.ExtraCodecs;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -14,8 +15,6 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-
-import javax.annotation.Nullable;
 
 public class CompressingRecipe implements Recipe<Container> {
 	protected final String group;
@@ -35,8 +34,8 @@ public class CompressingRecipe implements Recipe<Container> {
 	}
 
 	@Override
-	public ItemStack assemble(Container container, RegistryAccess registryAccess) {
-		return getResultItem(registryAccess).copy();
+	public ItemStack assemble(Container container, HolderLookup.Provider registries) {
+		return getResultItem(registries).copy();
 	}
 
 	public ItemStack assemble(Container container) {
@@ -54,7 +53,7 @@ public class CompressingRecipe implements Recipe<Container> {
 	}
 
 	@Override
-	public ItemStack getResultItem(RegistryAccess registryAccess) {
+	public ItemStack getResultItem(HolderLookup.Provider registries) {
 		return this.result;
 	}
 
@@ -81,36 +80,41 @@ public class CompressingRecipe implements Recipe<Container> {
 	}
 
 	public static class Serializer implements RecipeSerializer<CompressingRecipe> {
-		public static final Codec<CompressingRecipe> CODEC = RecordCodecBuilder.create(
+		public static final MapCodec<CompressingRecipe> CODEC = RecordCodecBuilder.mapCodec(
 				instance -> instance.group(
-								ExtraCodecs.strictOptionalField(Codec.STRING, "group", "").forGetter(recipe -> recipe.group),
+								Codec.STRING.optionalFieldOf("group", "").forGetter(recipe -> recipe.group),
 								Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(recipe -> recipe.ingredient),
-								ItemStack.SINGLE_ITEM_CODEC.fieldOf("result").forGetter(recipe -> recipe.result),
+								ItemStack.STRICT_SINGLE_ITEM_CODEC.fieldOf("result").forGetter(recipe -> recipe.result),
 								Codec.INT.optionalFieldOf("compressingtime", 900).forGetter(recipe -> recipe.compressingTime)
 						)
 						.apply(instance, CompressingRecipe::new)
 		);
+		public static final StreamCodec<RegistryFriendlyByteBuf, CompressingRecipe> STREAM_CODEC = StreamCodec.of(
+				CompressingRecipe.Serializer::toNetwork, CompressingRecipe.Serializer::fromNetwork
+		);
 
 		@Override
-		public Codec<CompressingRecipe> codec() {
+		public MapCodec<CompressingRecipe> codec() {
 			return CODEC;
 		}
 
-		@Nullable
 		@Override
-		public CompressingRecipe fromNetwork(FriendlyByteBuf buffer) {
+		public StreamCodec<RegistryFriendlyByteBuf, CompressingRecipe> streamCodec() {
+			return STREAM_CODEC;
+		}
+
+		public static CompressingRecipe fromNetwork(RegistryFriendlyByteBuf buffer) {
 			String s = buffer.readUtf();
-			Ingredient ingredient = Ingredient.fromNetwork(buffer);
-			ItemStack itemstack = buffer.readItem();
+			Ingredient ingredient = Ingredient.CONTENTS_STREAM_CODEC.decode(buffer);
+			ItemStack itemstack = ItemStack.STREAM_CODEC.decode(buffer);
 			int compressingTime = buffer.readVarInt();
 			return new CompressingRecipe(s, ingredient, itemstack, compressingTime);
 		}
 
-		@Override
-		public void toNetwork(FriendlyByteBuf buffer, CompressingRecipe recipe) {
+		public static void toNetwork(RegistryFriendlyByteBuf buffer, CompressingRecipe recipe) {
 			buffer.writeUtf(recipe.group);
-			recipe.ingredient.toNetwork(buffer);
-			buffer.writeItem(recipe.result);
+			Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.ingredient);
+			ItemStack.STREAM_CODEC.encode(buffer, recipe.result);
 			buffer.writeVarInt(recipe.compressingTime);
 		}
 	}

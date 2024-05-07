@@ -6,13 +6,13 @@
       "item": "minecraft:cauldron"
     },
     "E": {
-      "tag": "forge:gems/emerald"
+      "tag": "c:gems/emerald"
     },
     "I": {
-      "tag": "forge:storage_blocks/iron"
+      "tag": "c:storage_blocks/iron"
     },
     "O": {
-      "tag": "forge:obsidian"
+      "tag": "c:obsidians"
     }
   },
   "pattern": [
@@ -21,6 +21,7 @@
     "OIO"
   ],
   "result": {
-    "item": "thismatters:organic_matter_compressor"
+    "count": 1,
+    "id": "thismatters:organic_matter_compressor"
   }
 }

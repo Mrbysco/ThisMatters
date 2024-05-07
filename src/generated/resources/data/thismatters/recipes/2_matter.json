@@ -17,7 +17,7 @@
       "item": "minecraft:wooden_shovel"
     },
     {
-      "tag": "forge:leather"
+      "tag": "c:leathers"
     },
     {
       "item": "minecraft:leather_helmet"
@@ -59,7 +59,7 @@
       "tag": "minecraft:boats"
     },
     {
-      "tag": "forge:bones"
+      "tag": "c:bones"
     },
     {
       "tag": "minecraft:beds"
@@ -86,7 +86,7 @@
       "item": "minecraft:cake"
     },
     {
-      "tag": "forge:slimeballs"
+      "tag": "c:slimeballs"
     },
     {
       "item": "minecraft:paper"
@@ -101,19 +101,19 @@
       "item": "minecraft:lead"
     },
     {
-      "tag": "forge:crops"
+      "tag": "c:crops"
     },
     {
-      "tag": "forge:dyes"
+      "tag": "c:dyes"
     },
     {
       "item": "minecraft:sugar_cane"
     },
     {
-      "tag": "forge:feathers"
+      "tag": "c:feathers"
     },
     {
-      "tag": "forge:eggs"
+      "tag": "c:eggs"
     },
     {
       "tag": "minecraft:wooden_slabs"

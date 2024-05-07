@@ -5,6 +5,7 @@ import com.mrbysco.thismatters.datagen.builder.CompressingRecipeBuilder;
 import com.mrbysco.thismatters.datagen.builder.MatterRecipeBuilder;
 import com.mrbysco.thismatters.registry.ThisRegistry;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.WritableRegistry;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.BlockLootSubProvider;
@@ -17,6 +18,7 @@ import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -26,7 +28,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.ValidationContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.model.generators.BlockModelProvider;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
@@ -39,11 +41,10 @@ import net.neoforged.neoforge.data.event.GatherDataEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
 public class ThisDatagen {
 	@SubscribeEvent
 	public static void gatherData(GatherDataEvent event) {
@@ -53,7 +54,7 @@ public class ThisDatagen {
 		ExistingFileHelper helper = event.getExistingFileHelper();
 
 		if (event.includeServer()) {
-			generator.addProvider(event.includeServer(), new Loots(packOutput));
+			generator.addProvider(event.includeServer(), new Loots(packOutput, lookupProvider));
 			generator.addProvider(event.includeServer(), new Recipes(packOutput, lookupProvider));
 			BlockTagsProvider provider;
 			generator.addProvider(event.includeServer(), provider = new ThisBlockTags(packOutput, lookupProvider, helper));
@@ -68,10 +69,10 @@ public class ThisDatagen {
 	}
 
 	private static class Loots extends LootTableProvider {
-		public Loots(PackOutput packOutput) {
+		public Loots(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider) {
 			super(packOutput, Set.of(), List.of(
 					new SubProviderEntry(ThisBlockLoot::new, LootContextParamSets.BLOCK)
-			));
+			), lookupProvider);
 		}
 
 		public static class ThisBlockLoot extends BlockLootSubProvider {
@@ -92,8 +93,8 @@ public class ThisDatagen {
 		}
 
 		@Override
-		protected void validate(Map<ResourceLocation, LootTable> map, ValidationContext validationContext) {
-			map.forEach((name, table) -> table.validate(validationContext));
+		protected void validate(WritableRegistry<LootTable> writableregistry, ValidationContext validationcontext, ProblemReporter.Collector problemreporter$collector) {
+			super.validate(writableregistry, validationcontext, problemreporter$collector);
 		}
 	}
 
@@ -115,7 +116,7 @@ public class ThisDatagen {
 
 			MatterRecipeBuilder.matter(new ResourceLocation(ThisMatters.MOD_ID, "2_matter"), 2)
 					.requires(Items.WOODEN_SWORD).requires(Items.WOODEN_HOE).requires(Items.WOODEN_AXE)
-					.requires(Items.WOODEN_PICKAXE).requires(Items.WOODEN_SHOVEL).requires(Tags.Items.LEATHER)
+					.requires(Items.WOODEN_PICKAXE).requires(Items.WOODEN_SHOVEL).requires(Tags.Items.LEATHERS)
 					.requires(Items.LEATHER_HELMET).requires(Items.LEATHER_CHESTPLATE).requires(Items.LEATHER_LEGGINGS)
 					.requires(Items.LEATHER_BOOTS).requires(ItemTags.SIGNS).requires(Items.SADDLE)
 					.requires(ItemTags.LECTERN_BOOKS).requires(Items.BOOK).requires(Items.ENCHANTED_BOOK)
@@ -135,23 +136,19 @@ public class ThisDatagen {
 					.requires(ItemTags.WOODEN_PRESSURE_PLATES).requires(ItemTags.SAPLINGS).save(recipeOutput);
 
 			MatterRecipeBuilder.matter(new ResourceLocation(ThisMatters.MOD_ID, "4_matter"), 4)
-					.requires(ItemTags.PLANKS).requires(Items.MUSIC_DISC_13).requires(Items.MUSIC_DISC_CAT)
-					.requires(Items.MUSIC_DISC_BLOCKS).requires(Items.MUSIC_DISC_CHIRP).requires(Items.MUSIC_DISC_FAR)
-					.requires(Items.MUSIC_DISC_MALL).requires(Items.MUSIC_DISC_MELLOHI).requires(Items.MUSIC_DISC_STAL)
-					.requires(Items.MUSIC_DISC_STRAD).requires(Items.MUSIC_DISC_WARD).requires(Items.MUSIC_DISC_11)
-					.requires(Items.MUSIC_DISC_WAIT).requires(Items.MUSIC_DISC_OTHERSIDE).requires(Items.MUSIC_DISC_PIGSTEP)
-					.requires(Items.TUBE_CORAL_BLOCK).requires(Items.BRAIN_CORAL_BLOCK).requires(Items.BUBBLE_CORAL_BLOCK)
+					.requires(ItemTags.PLANKS).requires(ItemTags.MUSIC_DISCS).requires(Items.TUBE_CORAL_BLOCK)
+					.requires(Items.BRAIN_CORAL_BLOCK).requires(Items.BUBBLE_CORAL_BLOCK)
 					.requires(Items.FIRE_CORAL_BLOCK).requires(Items.HORN_CORAL_BLOCK).save(recipeOutput);
 
 			MatterRecipeBuilder.matter(new ResourceLocation(ThisMatters.MOD_ID, "5_matter"), 5)
 					.requires(ItemTags.WARPED_STEMS).save(recipeOutput);
 
 			MatterRecipeBuilder.matter(new ResourceLocation(ThisMatters.MOD_ID, "8_matter"), 8)
-					.requires(Tags.Items.HEADS).save(recipeOutput);
+					.requires(ItemTags.SKULLS).save(recipeOutput);
 
 			ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, ThisRegistry.ORGANIC_MATTER_COMPRESSOR.get())
 					.define('E', Tags.Items.GEMS_EMERALD)
-					.define('O', Tags.Items.OBSIDIAN)
+					.define('O', Tags.Items.OBSIDIANS)
 					.define('C', Items.CAULDRON)
 					.define('I', Tags.Items.STORAGE_BLOCKS_IRON)
 					.pattern("EOE").pattern("OCO").pattern("OIO").unlockedBy("has_obsidian", has(Blocks.OBSIDIAN)).save(recipeOutput);
