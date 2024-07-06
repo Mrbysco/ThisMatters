@@ -8,15 +8,15 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 
-public class CompressingRecipe implements Recipe<Container> {
+public class CompressingRecipe implements Recipe<RecipeInput> {
 	protected final String group;
 	protected final ItemStack result;
 	protected final Ingredient ingredient;
@@ -29,23 +29,22 @@ public class CompressingRecipe implements Recipe<Container> {
 		this.compressingTime = compressingTime;
 	}
 
-	public boolean matches(Container container, Level level) {
-		return this.ingredient.test(container.getItem(0));
+	@Override
+	public boolean matches(RecipeInput input, Level level) {
+		return this.ingredient.test(input.getItem(0));
 	}
 
 	@Override
-	public ItemStack assemble(Container container, HolderLookup.Provider registries) {
+	public ItemStack assemble(RecipeInput input, HolderLookup.Provider registries) {
 		return getResultItem(registries).copy();
 	}
 
-	public ItemStack assemble(Container container) {
-		return this.result.copy();
-	}
-
+	@Override
 	public boolean canCraftInDimensions(int width, int height) {
 		return true;
 	}
 
+	@Override
 	public NonNullList<Ingredient> getIngredients() {
 		NonNullList<Ingredient> nonnulllist = NonNullList.create();
 		nonnulllist.add(this.ingredient);
@@ -57,6 +56,7 @@ public class CompressingRecipe implements Recipe<Container> {
 		return this.result;
 	}
 
+	@Override
 	public String getGroup() {
 		return this.group;
 	}
@@ -70,6 +70,7 @@ public class CompressingRecipe implements Recipe<Container> {
 		return ThisRecipes.ORGANIC_MATTER_COMPRESSION_SERIALIZER.get();
 	}
 
+	@Override
 	public RecipeType<?> getType() {
 		return ThisRecipes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE.get();
 	}

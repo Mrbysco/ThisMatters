@@ -20,8 +20,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.Container;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -32,8 +30,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -63,7 +63,7 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 		@Override
 		protected void onContentsChanged(int slot) {
 			assert level != null;
-			compressingTotalTime = getTotalCompressingTime(level, OrganicMatterCompressorBlockEntity.this, new SimpleContainer(getStackInSlot(0)));
+			compressingTotalTime = getTotalCompressingTime(level, OrganicMatterCompressorBlockEntity.this, new SingleRecipeInput(getStackInSlot(0)));
 			compressingProgress = 0;
 			setChanged();
 		}
@@ -104,7 +104,7 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 	protected static final int SLOT_RESULT = 10;
 
 	private final Object2IntOpenHashMap<ResourceLocation> recipesUsed = new Object2IntOpenHashMap<>();
-	private final RecipeManager.CachedCheck<Container, CompressingRecipe> quickCheck;
+	private final RecipeManager.CachedCheck<RecipeInput, CompressingRecipe> quickCheck;
 	private int compressingProgress;
 	private int compressingTotalTime;
 	private int matterAmount;
@@ -130,7 +130,7 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 		CompoundTag compoundtag = tag.getCompound("RecipesUsed");
 
 		for (String s : compoundtag.getAllKeys()) {
-			this.recipesUsed.put(new ResourceLocation(s), compoundtag.getInt(s));
+			this.recipesUsed.put(ResourceLocation.tryParse(s), compoundtag.getInt(s));
 		}
 	}
 
@@ -173,7 +173,7 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 
 		ItemStack inputStack = compressorBlockEntity.inputHandler.getStackInSlot(0);
 		if (compressorBlockEntity.hasMatter() && !inputStack.isEmpty()) {
-			RecipeHolder<CompressingRecipe> recipeHolder = compressorBlockEntity.quickCheck.getRecipeFor(new SimpleContainer(inputStack), level).orElse(null);
+			RecipeHolder<CompressingRecipe> recipeHolder = compressorBlockEntity.quickCheck.getRecipeFor(new SingleRecipeInput(inputStack), level).orElse(null);
 			if (recipeHolder == null) return;
 			CompressingRecipe recipe = recipeHolder.value();
 			int i = compressorBlockEntity.getMaxStackSize();
@@ -181,7 +181,7 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 				++compressorBlockEntity.compressingProgress;
 				if (compressorBlockEntity.compressingProgress == compressorBlockEntity.compressingTotalTime) {
 					compressorBlockEntity.compressingProgress = 0;
-					compressorBlockEntity.compressingTotalTime = getTotalCompressingTime(level, compressorBlockEntity, compressorBlockEntity);
+					compressorBlockEntity.compressingTotalTime = getTotalCompressingTime(level, compressorBlockEntity, new SingleRecipeInput(inputStack));
 					if (compressorBlockEntity.compress(recipe, i)) {
 						compressorBlockEntity.setRecipeUsed(recipeHolder);
 					}
@@ -205,7 +205,7 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 
 	private boolean canCompress(@Nullable Recipe<?> recipe, int count) {
 		if (!inputHandler.getStackInSlot(0).isEmpty() && recipe != null) {
-			ItemStack assembledStack = ((CompressingRecipe) recipe).assemble(this);
+			ItemStack assembledStack = ((CompressingRecipe) recipe).assemble(new SingleRecipeInput(inputHandler.getStackInSlot(0)), this.level.registryAccess());
 			if (assembledStack.isEmpty()) {
 				return false;
 			} else {
@@ -228,7 +228,7 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 	private boolean compress(@Nullable Recipe<?> recipe, int count) {
 		if (recipe != null && this.canCompress(recipe, count)) {
 			ItemStack inputStack = inputHandler.getStackInSlot(0);
-			ItemStack assembledStack = ((CompressingRecipe) recipe).assemble(this);
+			ItemStack assembledStack = ((CompressingRecipe) recipe).assemble(new SingleRecipeInput(inputHandler.getStackInSlot(0)), this.level.registryAccess());
 			ItemStack resultStack = resultHandler.getStackInSlot(0);
 			if (resultStack.isEmpty()) {
 				resultHandler.setStackInSlot(0, assembledStack.copy());
@@ -378,7 +378,7 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 
 		if (slot == SLOT_INPUT && !flag) {
 			assert level != null;
-			this.compressingTotalTime = getTotalCompressingTime(level, this, new SimpleContainer(this.inputHandler.getStackInSlot(0)));
+			this.compressingTotalTime = getTotalCompressingTime(level, this, new SingleRecipeInput(this.inputHandler.getStackInSlot(0)));
 			this.compressingProgress = 0;
 			this.setChanged();
 		}
@@ -389,7 +389,7 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 		if (cachedValues.containsKey(itemID)) {
 			return cachedValues.get(itemID);
 		}
-		int value = level.getRecipeManager().getRecipeFor(ThisRecipes.MATTER_RECIPE_TYPE.get(), new SimpleContainer(stack), level)
+		int value = level.getRecipeManager().getRecipeFor(ThisRecipes.MATTER_RECIPE_TYPE.get(), new SingleRecipeInput(stack), level)
 				.map(holder -> holder.value().getMatterAmount()).orElse(getDefaultMatterValue(stack));
 		cachedValues.put(itemID, value);
 		return value;
@@ -403,8 +403,8 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 		return defaultValue;
 	}
 
-	private static int getTotalCompressingTime(Level level, OrganicMatterCompressorBlockEntity blockEntity, Container container) {
-		return blockEntity.quickCheck.getRecipeFor(container, level)
+	private static int getTotalCompressingTime(Level level, OrganicMatterCompressorBlockEntity blockEntity, RecipeInput input) {
+		return blockEntity.quickCheck.getRecipeFor(input, level)
 				.map(holder -> holder.value().getCompressingTime()).orElse(900);
 	}
 

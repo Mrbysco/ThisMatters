@@ -5,13 +5,13 @@ import com.mrbysco.thismatters.registry.ThisMenus;
 import com.mrbysco.thismatters.registry.ThisRecipes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.Mth;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -123,7 +123,7 @@ public class OrganicMatterCompressorMenu extends AbstractContainerMenu {
 	}
 
 	protected boolean canCompress(ItemStack compress) {
-		return level.getRecipeManager().getRecipeFor(ThisRecipes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE.get(), new SimpleContainer(compress), level).isPresent();
+		return level.getRecipeManager().getRecipeFor(ThisRecipes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE.get(), new SingleRecipeInput(compress), level).isPresent();
 	}
 
 	protected boolean isMatter(ItemStack stack) {

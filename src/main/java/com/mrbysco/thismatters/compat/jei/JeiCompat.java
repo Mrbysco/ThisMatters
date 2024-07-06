@@ -25,9 +25,9 @@ import java.util.Objects;
 
 @JeiPlugin
 public class JeiCompat implements IModPlugin {
-	public static final ResourceLocation PLUGIN_UID = new ResourceLocation(ThisMatters.MOD_ID, "main");
+	public static final ResourceLocation PLUGIN_UID = ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "main");
 
-	public static final ResourceLocation ORGANIC_MATTER_COMPRESSING = new ResourceLocation(ThisMatters.MOD_ID, "organic_matter_compressing");
+	public static final ResourceLocation ORGANIC_MATTER_COMPRESSING = ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "organic_matter_compressing");
 	public static final RecipeType<CompressingRecipe> ORGANIC_MATTER_COMPRESSING_TYPE = RecipeType.create(ThisMatters.MOD_ID, "organic_matter_compressing", CompressingRecipe.class);
 
 	@Nullable

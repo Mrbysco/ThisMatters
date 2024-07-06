@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[2,)"
+loaderVersion="[4,)"
 issueTrackerURL="https://github.com/Mrbysco/ThisMatters/issues"
 license="MIT"
 
@@ -15,12 +15,12 @@ Allows you to compress organic matter and other items into a single item.
 [[dependencies.thismatters]]
 modId="minecraft"
 type="REQUIRED"
-versionRange="[1.20.4,1.21)"
+versionRange="[1.21,1.22)"
 ordering="NONE"
 side="BOTH"
 [[dependencies.thismatters]]
 modId="neoforge"
 type="REQUIRED"
-versionRange="[20.4.117-beta,)"
+versionRange="[21.0.40-beta,)"
 ordering="NONE"
 side="BOTH"

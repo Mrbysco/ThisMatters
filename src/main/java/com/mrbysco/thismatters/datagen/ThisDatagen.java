@@ -77,8 +77,8 @@ public class ThisDatagen {
 
 		public static class ThisBlockLoot extends BlockLootSubProvider {
 
-			protected ThisBlockLoot() {
-				super(Set.of(), FeatureFlags.REGISTRY.allFlags());
+			protected ThisBlockLoot(HolderLookup.Provider provider) {
+				super(Set.of(), FeatureFlags.REGISTRY.allFlags(), provider);
 			}
 
 			@Override
@@ -106,7 +106,7 @@ public class ThisDatagen {
 
 		@Override
 		protected void buildRecipes(RecipeOutput recipeOutput) {
-			MatterRecipeBuilder.matter(new ResourceLocation(ThisMatters.MOD_ID, "1_matter"), 1)
+			MatterRecipeBuilder.matter(ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "1_matter"), 1)
 					.requires(Tags.Items.RODS_WOODEN).requires(Items.BAMBOO).requires(ItemTags.LEAVES)
 					.requires(Items.DEAD_BRAIN_CORAL).requires(Items.DEAD_BUBBLE_CORAL).requires(Items.DEAD_FIRE_CORAL)
 					.requires(Items.DEAD_HORN_CORAL).requires(Items.DEAD_TUBE_CORAL).requires(Items.DEAD_TUBE_CORAL_FAN)
@@ -114,7 +114,7 @@ public class ThisDatagen {
 					.requires(Items.DEAD_HORN_CORAL_FAN)
 					.save(recipeOutput);
 
-			MatterRecipeBuilder.matter(new ResourceLocation(ThisMatters.MOD_ID, "2_matter"), 2)
+			MatterRecipeBuilder.matter(ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "2_matter"), 2)
 					.requires(Items.WOODEN_SWORD).requires(Items.WOODEN_HOE).requires(Items.WOODEN_AXE)
 					.requires(Items.WOODEN_PICKAXE).requires(Items.WOODEN_SHOVEL).requires(Tags.Items.LEATHERS)
 					.requires(Items.LEATHER_HELMET).requires(Items.LEATHER_CHESTPLATE).requires(Items.LEATHER_LEGGINGS)
@@ -135,15 +135,15 @@ public class ThisDatagen {
 					.requires(Items.DEAD_BUBBLE_CORAL_BLOCK).requires(Items.DEAD_FIRE_CORAL_BLOCK).requires(Items.DEAD_HORN_CORAL_BLOCK)
 					.requires(ItemTags.WOODEN_PRESSURE_PLATES).requires(ItemTags.SAPLINGS).save(recipeOutput);
 
-			MatterRecipeBuilder.matter(new ResourceLocation(ThisMatters.MOD_ID, "4_matter"), 4)
-					.requires(ItemTags.PLANKS).requires(ItemTags.MUSIC_DISCS).requires(Items.TUBE_CORAL_BLOCK)
+			MatterRecipeBuilder.matter(ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "4_matter"), 4)
+					.requires(ItemTags.PLANKS).requires(Tags.Items.MUSIC_DISCS).requires(Items.TUBE_CORAL_BLOCK)
 					.requires(Items.BRAIN_CORAL_BLOCK).requires(Items.BUBBLE_CORAL_BLOCK)
 					.requires(Items.FIRE_CORAL_BLOCK).requires(Items.HORN_CORAL_BLOCK).save(recipeOutput);
 
-			MatterRecipeBuilder.matter(new ResourceLocation(ThisMatters.MOD_ID, "5_matter"), 5)
+			MatterRecipeBuilder.matter(ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "5_matter"), 5)
 					.requires(ItemTags.WARPED_STEMS).save(recipeOutput);
 
-			MatterRecipeBuilder.matter(new ResourceLocation(ThisMatters.MOD_ID, "8_matter"), 8)
+			MatterRecipeBuilder.matter(ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "8_matter"), 8)
 					.requires(ItemTags.SKULLS).save(recipeOutput);
 
 			ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, ThisRegistry.ORGANIC_MATTER_COMPRESSOR.get())
@@ -155,7 +155,7 @@ public class ThisDatagen {
 
 			CompressingRecipeBuilder.compressing(Ingredient.of(Items.COAL), Items.COAL_BLOCK, 900)
 					.unlockedBy("has_coal", has(Items.COAL))
-					.save(recipeOutput, new ResourceLocation(ThisMatters.MOD_ID, "coal_block_from_compressing_coal"));
+					.save(recipeOutput, ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "coal_block_from_compressing_coal"));
 		}
 	}
 

@@ -27,7 +27,7 @@ public class CompressingManager implements IRecipeManager<CompressingRecipe> {
 
 	@Method
 	public void addCompressing(String name, IIngredient ingredient, IItemStack resultStack, int time) {
-		final ResourceLocation id = new ResourceLocation("crafttweaker", name);
+		final ResourceLocation id = ResourceLocation.fromNamespaceAndPath("crafttweaker", name);
 		final Ingredient foodIngredient = ingredient.asVanillaIngredient();
 		final ItemStack resultItemStack = resultStack.getInternal();
 		final CompressingRecipe recipe = new CompressingRecipe( "", foodIngredient, resultItemStack, time);

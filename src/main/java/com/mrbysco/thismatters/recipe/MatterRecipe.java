@@ -9,15 +9,15 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 
-public class MatterRecipe implements Recipe<Container> {
+public class MatterRecipe implements Recipe<RecipeInput> {
 	protected final String group;
 	protected final ItemStack result;
 	protected final NonNullList<Ingredient> ingredients;
@@ -30,9 +30,10 @@ public class MatterRecipe implements Recipe<Container> {
 		this.matterAmount = matterAmount;
 	}
 
-	public boolean matches(Container container, Level level) {
-		for (int j = 0; j < container.getContainerSize(); ++j) {
-			ItemStack itemstack = container.getItem(j);
+	@Override
+	public boolean matches(RecipeInput input, Level level) {
+		for (int j = 0; j < input.size(); ++j) {
+			ItemStack itemstack = input.getItem(j);
 			if (!itemstack.isEmpty()) {
 				return this.getIngredients().stream().anyMatch(ingredient -> ingredient.test(itemstack));
 			}
@@ -42,14 +43,16 @@ public class MatterRecipe implements Recipe<Container> {
 	}
 
 	@Override
-	public ItemStack assemble(Container container, HolderLookup.Provider registries) {
+	public ItemStack assemble(RecipeInput input, HolderLookup.Provider registries) {
 		return getResultItem(registries).copy();
 	}
 
+	@Override
 	public boolean canCraftInDimensions(int width, int height) {
 		return true;
 	}
 
+	@Override
 	public NonNullList<Ingredient> getIngredients() {
 		return this.ingredients;
 	}
@@ -59,6 +62,7 @@ public class MatterRecipe implements Recipe<Container> {
 		return this.result;
 	}
 
+	@Override
 	public String getGroup() {
 		return this.group;
 	}
@@ -72,6 +76,7 @@ public class MatterRecipe implements Recipe<Container> {
 		return ThisRecipes.MATTER_SERIALIZER.get();
 	}
 
+	@Override
 	public RecipeType<?> getType() {
 		return ThisRecipes.MATTER_RECIPE_TYPE.get();
 	}

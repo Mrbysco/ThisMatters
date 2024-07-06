@@ -31,7 +31,7 @@ import net.minecraft.world.item.ItemStack;
 import java.util.List;
 
 public class OrganicMatterCompressingCategory implements IRecipeCategory<CompressingRecipe> {
-	public static final ResourceLocation RECIPE_COMPRESSING_JEI = new ResourceLocation(ThisMatters.MOD_ID, "textures/gui/jei/organic_matter_compressing.png");
+	public static final ResourceLocation RECIPE_COMPRESSING_JEI = ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "textures/gui/jei/organic_matter_compressing.png");
 
 	private final IDrawable background;
 	private final IDrawable icon;
