@@ -1,2 +1,1 @@
-* Re-enable CraftTweaker support
-* Re-enable JEI support
+* Initial port to 1.21
