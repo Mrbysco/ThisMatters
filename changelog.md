@@ -1,1 +1,2 @@
-* Initial update to 1.20.6
+* Re-enable CraftTweaker support
+* Re-enable JEI support
