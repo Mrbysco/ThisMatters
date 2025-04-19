@@ -123,7 +123,7 @@ public class ThisDatagen {
 					.requires(Items.FISHING_ROD).requires(Items.ITEM_FRAME).requires(Items.GLOW_ITEM_FRAME).requires(ItemTags.BOATS)
 					.requires(Tags.Items.BONES).requires(ItemTags.BEDS).requires(Items.FILLED_MAP).requires(Items.MAP)
 					.requires(Items.CARROT_ON_A_STICK).requires(Items.WARPED_FUNGUS_ON_A_STICK).requires(Items.NAME_TAG)
-					.requires(Items.SUGAR).requires(Items.CAKE).requires(Tags.Items.SLIMEBALLS).requires(Items.PAPER)
+					.requires(Items.SUGAR).requires(Items.CAKE).requires(Tags.Items.SLIME_BALLS).requires(Items.PAPER)
 					.requires(ItemTags.WOODEN_DOORS).requires(ItemTags.WOODEN_TRAPDOORS).requires(Items.LEAD)
 					.requires(Tags.Items.CROPS).requires(Tags.Items.DYES).requires(Items.SUGAR_CANE)
 					.requires(Tags.Items.FEATHERS).requires(Tags.Items.EGGS).requires(ItemTags.WOODEN_SLABS)
@@ -176,6 +176,24 @@ public class ThisDatagen {
 			add("thismatters.gui.jei.category.organic_matter_compressing", "Organic Matter Compressor");
 			add("thismatters.gui.jei.compressing.matter", "<Matter>");
 			add("thismatters.gui.jei.compressing.matter_amount", "Produces %s Matter");
+
+			addConfig("General", "General", "General Settings");
+			addConfig("minY", "Min Y", "Defines the minimum y level at which the Matter Compressor can work [default: 15]");
+			addConfig("maxMatter", "Max Matter", "Defines the maximum amount of matter until the Matter Compressor displays 100% [default: 150]");
+			addConfig("useDefaults", "Use Defaults", "Use built-in matter checks when no item match is found using recipes [default: true]");
+		}
+
+		/**
+		 * Add the translation for a config entry
+		 *
+		 * @param path        The path of the config entry
+		 * @param name        The name of the config entry
+		 * @param description The description of the config entry (optional in case of targeting "title" or similar entries that have no tooltip)
+		 */
+		private void addConfig(String path, String name, @Nullable String description) {
+			this.add("thismatters.configuration." + path, name);
+			if (description != null && !description.isEmpty())
+				this.add("thismatters.configuration." + path + ".tooltip", description);
 		}
 	}
 
