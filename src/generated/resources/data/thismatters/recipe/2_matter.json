@@ -1,183 +1,65 @@
 {
   "type": "thismatters:matter_recipe",
   "ingredients": [
-    {
-      "item": "minecraft:wooden_sword"
-    },
-    {
-      "item": "minecraft:wooden_hoe"
-    },
-    {
-      "item": "minecraft:wooden_axe"
-    },
-    {
-      "item": "minecraft:wooden_pickaxe"
-    },
-    {
-      "item": "minecraft:wooden_shovel"
-    },
-    {
-      "tag": "c:leathers"
-    },
-    {
-      "item": "minecraft:leather_helmet"
-    },
-    {
-      "item": "minecraft:leather_chestplate"
-    },
-    {
-      "item": "minecraft:leather_leggings"
-    },
-    {
-      "item": "minecraft:leather_boots"
-    },
-    {
-      "tag": "minecraft:signs"
-    },
-    {
-      "item": "minecraft:saddle"
-    },
-    {
-      "tag": "minecraft:lectern_books"
-    },
-    {
-      "item": "minecraft:book"
-    },
-    {
-      "item": "minecraft:enchanted_book"
-    },
-    {
-      "item": "minecraft:fishing_rod"
-    },
-    {
-      "item": "minecraft:item_frame"
-    },
-    {
-      "item": "minecraft:glow_item_frame"
-    },
-    {
-      "tag": "minecraft:boats"
-    },
-    {
-      "tag": "c:bones"
-    },
-    {
-      "tag": "minecraft:beds"
-    },
-    {
-      "item": "minecraft:filled_map"
-    },
-    {
-      "item": "minecraft:map"
-    },
-    {
-      "item": "minecraft:carrot_on_a_stick"
-    },
-    {
-      "item": "minecraft:warped_fungus_on_a_stick"
-    },
-    {
-      "item": "minecraft:name_tag"
-    },
-    {
-      "item": "minecraft:sugar"
-    },
-    {
-      "item": "minecraft:cake"
-    },
-    {
-      "tag": "c:slime_balls"
-    },
-    {
-      "item": "minecraft:paper"
-    },
-    {
-      "tag": "minecraft:wooden_doors"
-    },
-    {
-      "tag": "minecraft:wooden_trapdoors"
-    },
-    {
-      "item": "minecraft:lead"
-    },
-    {
-      "tag": "c:crops"
-    },
-    {
-      "tag": "c:dyes"
-    },
-    {
-      "item": "minecraft:sugar_cane"
-    },
-    {
-      "tag": "c:feathers"
-    },
-    {
-      "tag": "c:eggs"
-    },
-    {
-      "tag": "minecraft:wooden_slabs"
-    },
-    {
-      "tag": "minecraft:wooden_stairs"
-    },
-    {
-      "tag": "minecraft:wooden_fences"
-    },
-    {
-      "tag": "minecraft:wooden_buttons"
-    },
-    {
-      "item": "minecraft:tube_coral"
-    },
-    {
-      "item": "minecraft:brain_coral"
-    },
-    {
-      "item": "minecraft:bubble_coral"
-    },
-    {
-      "item": "minecraft:fire_coral"
-    },
-    {
-      "item": "minecraft:horn_coral"
-    },
-    {
-      "item": "minecraft:tube_coral_fan"
-    },
-    {
-      "item": "minecraft:brain_coral_fan"
-    },
-    {
-      "item": "minecraft:bubble_coral_fan"
-    },
-    {
-      "item": "minecraft:fire_coral_fan"
-    },
-    {
-      "item": "minecraft:horn_coral_fan"
-    },
-    {
-      "item": "minecraft:dead_tube_coral_block"
-    },
-    {
-      "item": "minecraft:dead_brain_coral_block"
-    },
-    {
-      "item": "minecraft:dead_bubble_coral_block"
-    },
-    {
-      "item": "minecraft:dead_fire_coral_block"
-    },
-    {
-      "item": "minecraft:dead_horn_coral_block"
-    },
-    {
-      "tag": "minecraft:wooden_pressure_plates"
-    },
-    {
-      "tag": "minecraft:saplings"
-    }
+    "minecraft:wooden_sword",
+    "minecraft:wooden_hoe",
+    "minecraft:wooden_axe",
+    "minecraft:wooden_pickaxe",
+    "minecraft:wooden_shovel",
+    "#c:leathers",
+    "minecraft:leather_helmet",
+    "minecraft:leather_chestplate",
+    "minecraft:leather_leggings",
+    "minecraft:leather_boots",
+    "#minecraft:signs",
+    "minecraft:saddle",
+    "#minecraft:lectern_books",
+    "minecraft:book",
+    "minecraft:enchanted_book",
+    "minecraft:fishing_rod",
+    "minecraft:item_frame",
+    "minecraft:glow_item_frame",
+    "#minecraft:boats",
+    "#c:bones",
+    "#minecraft:beds",
+    "minecraft:filled_map",
+    "minecraft:map",
+    "minecraft:carrot_on_a_stick",
+    "minecraft:warped_fungus_on_a_stick",
+    "minecraft:name_tag",
+    "minecraft:sugar",
+    "minecraft:cake",
+    "#c:slime_balls",
+    "minecraft:paper",
+    "#minecraft:wooden_doors",
+    "#minecraft:wooden_trapdoors",
+    "minecraft:lead",
+    "#c:crops",
+    "#c:dyes",
+    "minecraft:sugar_cane",
+    "#c:feathers",
+    "#c:eggs",
+    "#minecraft:wooden_slabs",
+    "#minecraft:wooden_stairs",
+    "#minecraft:wooden_fences",
+    "#minecraft:wooden_buttons",
+    "minecraft:tube_coral",
+    "minecraft:brain_coral",
+    "minecraft:bubble_coral",
+    "minecraft:fire_coral",
+    "minecraft:horn_coral",
+    "minecraft:tube_coral_fan",
+    "minecraft:brain_coral_fan",
+    "minecraft:bubble_coral_fan",
+    "minecraft:fire_coral_fan",
+    "minecraft:horn_coral_fan",
+    "minecraft:dead_tube_coral_block",
+    "minecraft:dead_brain_coral_block",
+    "minecraft:dead_bubble_coral_block",
+    "minecraft:dead_fire_coral_block",
+    "minecraft:dead_horn_coral_block",
+    "#minecraft:wooden_pressure_plates",
+    "#minecraft:saplings"
   ],
   "matter": 2
 }

@@ -8,10 +8,11 @@ import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
 import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
 
 import javax.annotation.Nullable;
@@ -50,20 +51,21 @@ public class CompressingRecipeBuilder implements RecipeBuilder {
 		return this.result;
 	}
 
-	public void save(RecipeOutput recipeOutput, ResourceLocation id) {
-		this.ensureValid(id);
-		Advancement.Builder advancement$builder = recipeOutput.advancement()
-				.addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(id))
-				.rewards(AdvancementRewards.Builder.recipe(id))
+	public void save(RecipeOutput recipeOutput, ResourceKey<Recipe<?>> recipeResourceKey) {
+		this.ensureValid(recipeResourceKey);
+		Advancement.Builder requirements = recipeOutput.advancement()
+				.addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(recipeResourceKey))
+				.rewards(AdvancementRewards.Builder.recipe(recipeResourceKey))
 				.requirements(AdvancementRequirements.Strategy.OR);
-		this.criteria.forEach(advancement$builder::addCriterion);
+		this.criteria.forEach(requirements::addCriterion);
 		CompressingRecipe recipe = new CompressingRecipe(this.group == null ? "" : this.group, this.ingredient, new ItemStack(result), this.compressingTime);
-		recipeOutput.accept(id, recipe, advancement$builder.build(id.withPrefix("recipes/misc/")));
+		recipeOutput.accept(recipeResourceKey, recipe, requirements.build(recipeResourceKey.location().withPrefix("recipes/misc/")));
 	}
 
-	private void ensureValid(ResourceLocation location) {
+	private void ensureValid(ResourceKey<Recipe<?>> recipe) {
 		if (this.criteria.isEmpty()) {
-			throw new IllegalStateException("No way of obtaining recipe " + location);
+			throw new IllegalStateException("No way of obtaining recipe " + recipe.location());
 		}
 	}
+
 }

@@ -5,22 +5,28 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.mrbysco.thismatters.registry.ThisRecipes;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.PlacementInfo;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeBookCategories;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 
+import javax.annotation.Nullable;
+
 public class CompressingRecipe implements Recipe<RecipeInput> {
 	protected final String group;
-	protected final ItemStack result;
 	protected final Ingredient ingredient;
+	protected final ItemStack result;
 	protected final int compressingTime;
+	@Nullable
+	private PlacementInfo placementInfo;
 
 	public CompressingRecipe(String group, Ingredient ingredient, ItemStack resultStack, int compressingTime) {
 		this.group = group;
@@ -30,35 +36,22 @@ public class CompressingRecipe implements Recipe<RecipeInput> {
 	}
 
 	@Override
+	public String group() {
+		return this.group;
+	}
+
+	@Override
 	public boolean matches(RecipeInput input, Level level) {
 		return this.ingredient.test(input.getItem(0));
 	}
 
 	@Override
 	public ItemStack assemble(RecipeInput input, HolderLookup.Provider registries) {
-		return getResultItem(registries).copy();
+		return this.getResult().copy();
 	}
 
-	@Override
-	public boolean canCraftInDimensions(int width, int height) {
-		return true;
-	}
-
-	@Override
-	public NonNullList<Ingredient> getIngredients() {
-		NonNullList<Ingredient> nonnulllist = NonNullList.create();
-		nonnulllist.add(this.ingredient);
-		return nonnulllist;
-	}
-
-	@Override
-	public ItemStack getResultItem(HolderLookup.Provider registries) {
-		return this.result;
-	}
-
-	@Override
-	public String getGroup() {
-		return this.group;
+	public ItemStack getResult() {
+		return result;
 	}
 
 	public int getCompressingTime() {
@@ -66,13 +59,27 @@ public class CompressingRecipe implements Recipe<RecipeInput> {
 	}
 
 	@Override
-	public RecipeSerializer<?> getSerializer() {
+	public RecipeSerializer<CompressingRecipe> getSerializer() {
 		return ThisRecipes.ORGANIC_MATTER_COMPRESSION_SERIALIZER.get();
 	}
 
 	@Override
-	public RecipeType<?> getType() {
+	public RecipeType<CompressingRecipe> getType() {
 		return ThisRecipes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE.get();
+	}
+
+	@Override
+	public PlacementInfo placementInfo() {
+		if (this.placementInfo == null) {
+			this.placementInfo = PlacementInfo.create(this.ingredient);
+		}
+
+		return this.placementInfo;
+	}
+
+	@Override
+	public RecipeBookCategory recipeBookCategory() {
+		return RecipeBookCategories.CRAFTING_MISC;
 	}
 
 	@Override
@@ -84,7 +91,7 @@ public class CompressingRecipe implements Recipe<RecipeInput> {
 		public static final MapCodec<CompressingRecipe> CODEC = RecordCodecBuilder.mapCodec(
 				instance -> instance.group(
 								Codec.STRING.optionalFieldOf("group", "").forGetter(recipe -> recipe.group),
-								Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(recipe -> recipe.ingredient),
+								Ingredient.CODEC.fieldOf("ingredient").forGetter(recipe -> recipe.ingredient),
 								ItemStack.STRICT_SINGLE_ITEM_CODEC.fieldOf("result").forGetter(recipe -> recipe.result),
 								Codec.INT.optionalFieldOf("compressingtime", 900).forGetter(recipe -> recipe.compressingTime)
 						)

@@ -9,7 +9,6 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.MapColor;
@@ -28,12 +27,12 @@ public class ThisRegistry {
 	public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, ThisMatters.MOD_ID);
 	public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ThisMatters.MOD_ID);
 
-	public static final DeferredBlock<OrganicMatterCompressorBlock> ORGANIC_MATTER_COMPRESSOR = BLOCKS.register("organic_matter_compressor", () ->
-			new OrganicMatterCompressorBlock(Block.Properties.of().mapColor(MapColor.COLOR_BLACK)
+	public static final DeferredBlock<OrganicMatterCompressorBlock> ORGANIC_MATTER_COMPRESSOR = BLOCKS.registerBlock("organic_matter_compressor", (properties) ->
+			new OrganicMatterCompressorBlock(properties.mapColor(MapColor.COLOR_BLACK)
 					.requiresCorrectToolForDrops().strength(5.0F, 120.0F).randomTicks().sound(SoundType.STONE).noOcclusion()));
 
 	public static final Supplier<BlockEntityType<OrganicMatterCompressorBlockEntity>> ORGANIC_MATTER_COMPRESSOR_BE = BLOCK_ENTITY_TYPES.register("organic_matter_compressor", () ->
-			BlockEntityType.Builder.of(OrganicMatterCompressorBlockEntity::new, ORGANIC_MATTER_COMPRESSOR.get()).build(null));
+			new BlockEntityType<>(OrganicMatterCompressorBlockEntity::new, ORGANIC_MATTER_COMPRESSOR.get()));
 
 	public static final DeferredItem<BlockItem> ORGANIC_MATTER_COMPRESSOR_ITEM = ITEMS.registerSimpleBlockItem(ORGANIC_MATTER_COMPRESSOR);
 

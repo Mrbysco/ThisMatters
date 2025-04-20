@@ -1,9 +1,7 @@
 {
   "type": "thismatters:matter_recipe",
   "ingredients": [
-    {
-      "tag": "minecraft:skulls"
-    }
+    "#minecraft:skulls"
   ],
   "matter": 8
 }

@@ -12,6 +12,8 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig.Type;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -37,6 +39,12 @@ public class ThisMatters {
 		if (dist.isClient()) {
 			container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
 			eventBus.addListener(ClientHandler::onRegisterMenu);
+			NeoForge.EVENT_BUS.addListener(ClientHandler::onRecipeReceived);
+			NeoForge.EVENT_BUS.addListener(ClientHandler::onPlayerDisconnect);
+		} else {
+			NeoForge.EVENT_BUS.addListener((OnDatapackSyncEvent event) -> {
+				event.sendRecipes(ThisRecipes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE.get(), ThisRecipes.MATTER_RECIPE_TYPE.get());
+			});
 		}
 	}
 }

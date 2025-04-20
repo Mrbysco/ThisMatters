@@ -4,8 +4,15 @@ import com.mrbysco.thismatters.ThisMatters;
 import com.mrbysco.thismatters.datagen.builder.CompressingRecipeBuilder;
 import com.mrbysco.thismatters.datagen.builder.MatterRecipeBuilder;
 import com.mrbysco.thismatters.registry.ThisRegistry;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.ItemModelGenerators;
+import net.minecraft.client.data.models.ModelProvider;
+import net.minecraft.client.data.models.model.TexturedModel;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.WritableRegistry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.BlockLootSubProvider;
@@ -13,13 +20,13 @@ import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.flag.FeatureFlags;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
@@ -29,13 +36,8 @@ import net.minecraft.world.level.storage.loot.ValidationContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.model.generators.BlockModelProvider;
-import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
-import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
-import net.neoforged.neoforge.client.model.generators.ModelFile;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import org.jetbrains.annotations.Nullable;
@@ -47,25 +49,19 @@ import java.util.concurrent.CompletableFuture;
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
 public class ThisDatagen {
 	@SubscribeEvent
-	public static void gatherData(GatherDataEvent event) {
+	public static void gatherData(GatherDataEvent.Client event) {
 		DataGenerator generator = event.getGenerator();
 		PackOutput packOutput = generator.getPackOutput();
 		CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
-		ExistingFileHelper helper = event.getExistingFileHelper();
 
-		if (event.includeServer()) {
-			generator.addProvider(event.includeServer(), new Loots(packOutput, lookupProvider));
-			generator.addProvider(event.includeServer(), new Recipes(packOutput, lookupProvider));
-			BlockTagsProvider provider;
-			generator.addProvider(event.includeServer(), provider = new ThisBlockTags(packOutput, lookupProvider, helper));
-			generator.addProvider(event.includeServer(), new ThisItemTags(packOutput, lookupProvider, provider, helper));
-		}
-		if (event.includeClient()) {
-			generator.addProvider(event.includeServer(), new Language(packOutput));
-			generator.addProvider(event.includeServer(), new BlockModels(packOutput, helper));
-			generator.addProvider(event.includeServer(), new ItemModels(packOutput, helper));
-			generator.addProvider(event.includeServer(), new BlockStates(packOutput, helper));
-		}
+		generator.addProvider(true, new Loots(packOutput, lookupProvider));
+		generator.addProvider(true, new Recipes.Runner(packOutput, lookupProvider));
+		BlockTagsProvider provider;
+		generator.addProvider(true, provider = new ThisBlockTags(packOutput, lookupProvider));
+		generator.addProvider(true, new ThisItemTags(packOutput, lookupProvider, provider));
+
+		generator.addProvider(true, new Language(packOutput));
+		generator.addProvider(true, new Models(packOutput));
 	}
 
 	private static class Loots extends LootTableProvider {
@@ -100,21 +96,24 @@ public class ThisDatagen {
 
 	public static class Recipes extends RecipeProvider {
 
-		public Recipes(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider) {
-			super(packOutput, lookupProvider);
+		private final HolderGetter<Item> items;
+
+		public Recipes(HolderLookup.Provider provider, RecipeOutput recipeOutput) {
+			super(provider, recipeOutput);
+			this.items = registries.lookupOrThrow(Registries.ITEM);
 		}
 
 		@Override
-		protected void buildRecipes(RecipeOutput recipeOutput) {
-			MatterRecipeBuilder.matter(ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "1_matter"), 1)
+		protected void buildRecipes() {
+			matter(ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "1_matter"), 1)
 					.requires(Tags.Items.RODS_WOODEN).requires(Items.BAMBOO).requires(ItemTags.LEAVES)
 					.requires(Items.DEAD_BRAIN_CORAL).requires(Items.DEAD_BUBBLE_CORAL).requires(Items.DEAD_FIRE_CORAL)
 					.requires(Items.DEAD_HORN_CORAL).requires(Items.DEAD_TUBE_CORAL).requires(Items.DEAD_TUBE_CORAL_FAN)
 					.requires(Items.DEAD_BRAIN_CORAL_FAN).requires(Items.DEAD_BUBBLE_CORAL_FAN).requires(Items.DEAD_FIRE_CORAL_FAN)
 					.requires(Items.DEAD_HORN_CORAL_FAN)
-					.save(recipeOutput);
+					.save(output);
 
-			MatterRecipeBuilder.matter(ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "2_matter"), 2)
+			matter(ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "2_matter"), 2)
 					.requires(Items.WOODEN_SWORD).requires(Items.WOODEN_HOE).requires(Items.WOODEN_AXE)
 					.requires(Items.WOODEN_PICKAXE).requires(Items.WOODEN_SHOVEL).requires(Tags.Items.LEATHERS)
 					.requires(Items.LEATHER_HELMET).requires(Items.LEATHER_CHESTPLATE).requires(Items.LEATHER_LEGGINGS)
@@ -133,29 +132,54 @@ public class ThisDatagen {
 					.requires(Items.BRAIN_CORAL_FAN).requires(Items.BUBBLE_CORAL_FAN).requires(Items.FIRE_CORAL_FAN)
 					.requires(Items.HORN_CORAL_FAN).requires(Items.DEAD_TUBE_CORAL_BLOCK).requires(Items.DEAD_BRAIN_CORAL_BLOCK)
 					.requires(Items.DEAD_BUBBLE_CORAL_BLOCK).requires(Items.DEAD_FIRE_CORAL_BLOCK).requires(Items.DEAD_HORN_CORAL_BLOCK)
-					.requires(ItemTags.WOODEN_PRESSURE_PLATES).requires(ItemTags.SAPLINGS).save(recipeOutput);
+					.requires(ItemTags.WOODEN_PRESSURE_PLATES).requires(ItemTags.SAPLINGS)
+					.save(output);
 
-			MatterRecipeBuilder.matter(ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "4_matter"), 4)
+			matter(ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "4_matter"), 4)
 					.requires(ItemTags.PLANKS).requires(Tags.Items.MUSIC_DISCS).requires(Items.TUBE_CORAL_BLOCK)
 					.requires(Items.BRAIN_CORAL_BLOCK).requires(Items.BUBBLE_CORAL_BLOCK)
-					.requires(Items.FIRE_CORAL_BLOCK).requires(Items.HORN_CORAL_BLOCK).save(recipeOutput);
+					.requires(Items.FIRE_CORAL_BLOCK).requires(Items.HORN_CORAL_BLOCK)
+					.save(output);
 
-			MatterRecipeBuilder.matter(ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "5_matter"), 5)
-					.requires(ItemTags.WARPED_STEMS).save(recipeOutput);
+			matter(ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "5_matter"), 5)
+					.requires(ItemTags.WARPED_STEMS)
+					.save(output);
 
-			MatterRecipeBuilder.matter(ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "8_matter"), 8)
-					.requires(ItemTags.SKULLS).save(recipeOutput);
+			matter(ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "8_matter"), 8)
+					.requires(ItemTags.SKULLS)
+					.save(output);
 
-			ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, ThisRegistry.ORGANIC_MATTER_COMPRESSOR.get())
+			shaped(RecipeCategory.REDSTONE, ThisRegistry.ORGANIC_MATTER_COMPRESSOR.get())
 					.define('E', Tags.Items.GEMS_EMERALD)
 					.define('O', Tags.Items.OBSIDIANS)
 					.define('C', Items.CAULDRON)
 					.define('I', Tags.Items.STORAGE_BLOCKS_IRON)
-					.pattern("EOE").pattern("OCO").pattern("OIO").unlockedBy("has_obsidian", has(Blocks.OBSIDIAN)).save(recipeOutput);
+					.pattern("EOE").pattern("OCO").pattern("OIO").unlockedBy("has_obsidian", has(Blocks.OBSIDIAN))
+					.save(output);
 
 			CompressingRecipeBuilder.compressing(Ingredient.of(Items.COAL), Items.COAL_BLOCK, 900)
 					.unlockedBy("has_coal", has(Items.COAL))
-					.save(recipeOutput, ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "coal_block_from_compressing_coal"));
+					.save(output, ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "coal_block_from_compressing_coal").toString());
+		}
+
+		private MatterRecipeBuilder matter(ResourceLocation location, int matterAmount) {
+			return MatterRecipeBuilder.matter(this.items, location, matterAmount);
+		}
+
+		public static class Runner extends RecipeProvider.Runner {
+			public Runner(PackOutput output, CompletableFuture<Provider> completableFuture) {
+				super(output, completableFuture);
+			}
+
+			@Override
+			protected RecipeProvider createRecipeProvider(HolderLookup.Provider provider, RecipeOutput recipeOutput) {
+				return new Recipes(provider, recipeOutput);
+			}
+
+			@Override
+			public String getName() {
+				return "ThisMatters Recipes";
+			}
 		}
 	}
 
@@ -197,48 +221,21 @@ public class ThisDatagen {
 		}
 	}
 
-	private static class BlockStates extends BlockStateProvider {
-		public BlockStates(PackOutput packOutput, ExistingFileHelper helper) {
-			super(packOutput, ThisMatters.MOD_ID, helper);
+	private static class Models extends ModelProvider {
+		public Models(PackOutput packOutput) {
+			super(packOutput, ThisMatters.MOD_ID);
 		}
 
 		@Override
-		protected void registerStatesAndModels() {
-			compressorState(ThisRegistry.ORGANIC_MATTER_COMPRESSOR.get());
-		}
-
-		private void compressorState(Block block) {
-			ModelFile model = models().getExistingFile(modLoc("block/organic_matter_compressor"));
-			getVariantBuilder(block)
-					.partialState().modelForState().modelFile(model).addModel();
-		}
-	}
-
-	private static class BlockModels extends BlockModelProvider {
-		public BlockModels(PackOutput packOutput, ExistingFileHelper helper) {
-			super(packOutput, ThisMatters.MOD_ID, helper);
-		}
-
-		@Override
-		protected void registerModels() {
-
-		}
-	}
-
-	private static class ItemModels extends ItemModelProvider {
-		public ItemModels(PackOutput packOutput, ExistingFileHelper helper) {
-			super(packOutput, ThisMatters.MOD_ID, helper);
-		}
-
-		@Override
-		protected void registerModels() {
-			withExistingParent(ThisRegistry.ORGANIC_MATTER_COMPRESSOR.getId().getPath(), modLoc("block/organic_matter_compressor"));
+		protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
+			ResourceLocation resourcelocation = TexturedModel.CUBE.create(ThisRegistry.ORGANIC_MATTER_COMPRESSOR.get(), blockModels.modelOutput);
+			blockModels.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(ThisRegistry.ORGANIC_MATTER_COMPRESSOR.get(), resourcelocation));
 		}
 	}
 
 	public static class ThisBlockTags extends BlockTagsProvider {
-		public ThisBlockTags(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, @Nullable ExistingFileHelper existingFileHelper) {
-			super(output, lookupProvider, ThisMatters.MOD_ID, existingFileHelper);
+		public ThisBlockTags(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+			super(output, lookupProvider, ThisMatters.MOD_ID);
 		}
 
 		@Override
@@ -248,8 +245,8 @@ public class ThisDatagen {
 	}
 
 	public static class ThisItemTags extends ItemTagsProvider {
-		public ThisItemTags(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, BlockTagsProvider blockTagsProvider, ExistingFileHelper existingFileHelper) {
-			super(output, lookupProvider, blockTagsProvider.contentsGetter(), ThisMatters.MOD_ID, existingFileHelper);
+		public ThisItemTags(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, BlockTagsProvider blockTagsProvider) {
+			super(output, lookupProvider, blockTagsProvider.contentsGetter(), ThisMatters.MOD_ID);
 		}
 
 		@Override

@@ -1,8 +1,6 @@
 {
   "type": "thismatters:organic_matter_compression",
-  "ingredient": {
-    "item": "minecraft:coal"
-  },
+  "ingredient": "minecraft:coal",
   "result": {
     "id": "minecraft:coal_block"
   }

@@ -4,13 +4,13 @@ import com.mrbysco.thismatters.config.ThisConfig;
 import com.mrbysco.thismatters.recipe.MatterRecipe;
 import com.mrbysco.thismatters.registry.ThisRecipes;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AttachedStemBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CactusBlock;
@@ -23,7 +23,7 @@ import net.minecraft.world.level.block.WebBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -33,16 +33,16 @@ import java.util.Map.Entry;
 public class MatterUtil {
 	public static final List<MatterInfo> matterList = new ArrayList<>();
 
-	public static void reloadMatterList(Level level) {
+	public static void reloadMatterList(ServerLevel level) {
 		if (level != null) {
-			final List<RecipeHolder<MatterRecipe>> matterRecipeHolderList = level.getRecipeManager().getAllRecipesFor(ThisRecipes.MATTER_RECIPE_TYPE.get());
+			final Collection<RecipeHolder<MatterRecipe>> matterRecipeHolderList = level.recipeAccess().recipeMap().byType(ThisRecipes.MATTER_RECIPE_TYPE.get());
 			Map<Integer, List<ItemStack>> matterMap = new HashMap<>();
 			for (RecipeHolder<MatterRecipe> matterRecipeHolder : matterRecipeHolderList) {
 				if (matterRecipeHolder == null) continue;
 				MatterRecipe matterRecipe = matterRecipeHolder.value();
 				List<ItemStack> ingredientList = matterMap.getOrDefault(matterRecipe.getMatterAmount(), new ArrayList<>());
 				for (Ingredient ingredient : matterRecipe.getIngredients()) {
-					ingredientList.addAll(Arrays.asList(ingredient.getItems()));
+					ingredient.getValues().forEach(holder -> ingredientList.add(holder.value().getDefaultInstance()));
 				}
 				Collections.shuffle(ingredientList);
 
