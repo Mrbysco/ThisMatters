@@ -7,6 +7,7 @@ import com.mrbysco.thismatters.registry.ThisRegistry;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.ModelProvider;
+import net.minecraft.client.data.models.MultiVariant;
 import net.minecraft.client.data.models.model.TexturedModel;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
@@ -229,7 +230,9 @@ public class ThisDatagen {
 		@Override
 		protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
 			ResourceLocation resourcelocation = TexturedModel.CUBE.create(ThisRegistry.ORGANIC_MATTER_COMPRESSOR.get(), blockModels.modelOutput);
-			blockModels.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(ThisRegistry.ORGANIC_MATTER_COMPRESSOR.get(), resourcelocation));
+			blockModels.blockStateOutput.accept(
+					BlockModelGenerators.createSimpleBlock(ThisRegistry.ORGANIC_MATTER_COMPRESSOR.get(), BlockModelGenerators.plainVariant(resourcelocation))
+			);
 		}
 	}
 

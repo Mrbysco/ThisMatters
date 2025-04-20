@@ -121,18 +121,18 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 	@Override
 	public void loadAdditional(@NotNull CompoundTag tag, @NotNull HolderLookup.Provider registries) {
 		super.loadAdditional(tag, registries);
-		this.matterHandler.deserializeNBT(registries, tag.getCompound("MatterStackHandler"));
-		this.inputHandler.deserializeNBT(registries, tag.getCompound("InputStackHandler"));
-		this.resultHandler.deserializeNBT(registries, tag.getCompound("ResultStackHandler"));
+		this.matterHandler.deserializeNBT(registries, tag.getCompoundOrEmpty("MatterStackHandler"));
+		this.inputHandler.deserializeNBT(registries, tag.getCompoundOrEmpty("InputStackHandler"));
+		this.resultHandler.deserializeNBT(registries, tag.getCompoundOrEmpty("ResultStackHandler"));
 
-		this.matterAmount = tag.getInt("MatterAmount");
-		this.maxMatter = tag.getInt("MaxMatter");
-		this.compressingProgress = tag.getInt("CompressingTime");
-		this.compressingTotalTime = tag.getInt("CompressingTotalTime");
-		CompoundTag compoundtag = tag.getCompound("RecipesUsed");
+		this.matterAmount = tag.getIntOr("MatterAmount", 0);
+		this.maxMatter = tag.getIntOr("MaxMatter", 0);
+		this.compressingProgress = tag.getIntOr("CompressingTime", 0);
+		this.compressingTotalTime = tag.getIntOr("CompressingTotalTime", 0);
+		CompoundTag compoundtag = tag.getCompoundOrEmpty("RecipesUsed");
 
-		for (String s : compoundtag.getAllKeys()) {
-			this.recipesUsed.put(ResourceLocation.tryParse(s), compoundtag.getInt(s));
+		for (String s : compoundtag.keySet()) {
+			this.recipesUsed.put(ResourceLocation.tryParse(s), compoundtag.getIntOr(s, 0));
 		}
 	}
 

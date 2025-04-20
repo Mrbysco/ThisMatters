@@ -13,6 +13,7 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
@@ -58,19 +59,15 @@ public class OrganicMatterCompressorBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	public void onRemove(BlockState state, Level level, BlockPos pos, BlockState replacementState, boolean isMoving) {
-		if (!state.is(replacementState.getBlock())) {
-			BlockEntity blockentity = level.getBlockEntity(pos);
-			if (blockentity instanceof OrganicMatterCompressorBlockEntity) {
-				if (level instanceof ServerLevel) {
-					Containers.dropContents(level, pos, (OrganicMatterCompressorBlockEntity) blockentity);
-				}
-
-				level.updateNeighbourForOutputSignal(pos, this);
+	public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @org.jetbrains.annotations.Nullable BlockEntity blockEntity, ItemStack tool) {
+		if (blockEntity instanceof OrganicMatterCompressorBlockEntity compressorBlockEntity) {
+			if (level instanceof ServerLevel) {
+				Containers.dropContents(level, pos, compressorBlockEntity);
 			}
 
-			super.onRemove(state, level, pos, replacementState, isMoving);
+			level.updateNeighbourForOutputSignal(pos, this);
 		}
+		super.playerDestroy(level, player, pos, state, blockEntity, tool);
 	}
 
 	@Override
@@ -84,7 +81,7 @@ public class OrganicMatterCompressorBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	public RenderShape getRenderShape(BlockState p_48727_) {
+	public RenderShape getRenderShape(BlockState state) {
 		return RenderShape.MODEL;
 	}
 
