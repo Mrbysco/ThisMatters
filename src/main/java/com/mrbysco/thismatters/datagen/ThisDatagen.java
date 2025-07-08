@@ -7,7 +7,6 @@ import com.mrbysco.thismatters.registry.ThisRegistry;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.ModelProvider;
-import net.minecraft.client.data.models.MultiVariant;
 import net.minecraft.client.data.models.model.TexturedModel;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
@@ -47,7 +46,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber
 public class ThisDatagen {
 	@SubscribeEvent
 	public static void gatherData(GatherDataEvent.Client event) {

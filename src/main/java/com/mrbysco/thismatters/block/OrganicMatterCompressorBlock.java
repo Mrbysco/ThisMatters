@@ -22,8 +22,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class OrganicMatterCompressorBlock extends BaseEntityBlock {
 	public static final MapCodec<OrganicMatterCompressorBlock> CODEC = simpleCodec(OrganicMatterCompressorBlock::new);
@@ -59,7 +58,7 @@ public class OrganicMatterCompressorBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @org.jetbrains.annotations.Nullable BlockEntity blockEntity, ItemStack tool) {
+	public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
 		if (blockEntity instanceof OrganicMatterCompressorBlockEntity compressorBlockEntity) {
 			if (level instanceof ServerLevel) {
 				Containers.dropContents(level, pos, compressorBlockEntity);
