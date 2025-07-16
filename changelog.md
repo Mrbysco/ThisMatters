@@ -1,1 +1,2 @@
-* Initial update to 1.21.5
+* Initial update to 1.21.7
+* Re-enable JEI support
