@@ -1,1 +1,1 @@
-* Initial update to 1.21.5
+* Fix issue where the recipes get duplicated every reload (client-side)
