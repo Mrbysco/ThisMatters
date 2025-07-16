@@ -2,6 +2,7 @@ package com.mrbysco.thismatters.util;
 
 import com.mrbysco.thismatters.config.ThisConfig;
 import com.mrbysco.thismatters.recipe.MatterRecipe;
+import com.mrbysco.thismatters.recipe.MatterRecipeCache;
 import com.mrbysco.thismatters.registry.ThisRecipes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
@@ -11,6 +12,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AttachedStemBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CactusBlock;
@@ -23,7 +25,6 @@ import net.minecraft.world.level.block.WebBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -33,9 +34,14 @@ import java.util.Map.Entry;
 public class MatterUtil {
 	public static final List<MatterInfo> matterList = new ArrayList<>();
 
-	public static void reloadMatterList(ServerLevel level) {
+	public static void reloadMatterList(Level level) {
 		if (level != null) {
-			final Collection<RecipeHolder<MatterRecipe>> matterRecipeHolderList = level.recipeAccess().recipeMap().byType(ThisRecipes.MATTER_RECIPE_TYPE.get());
+			List<RecipeHolder<MatterRecipe>> matterRecipeHolderList;
+			if (level instanceof ServerLevel serverLevel) {
+				matterRecipeHolderList = serverLevel.recipeAccess().recipeMap().byType(ThisRecipes.MATTER_RECIPE_TYPE.get()).stream().toList();
+			} else {
+				matterRecipeHolderList = MatterRecipeCache.getMatterRecipes();
+			}
 			Map<Integer, List<ItemStack>> matterMap = new HashMap<>();
 			for (RecipeHolder<MatterRecipe> matterRecipeHolder : matterRecipeHolderList) {
 				if (matterRecipeHolder == null) continue;

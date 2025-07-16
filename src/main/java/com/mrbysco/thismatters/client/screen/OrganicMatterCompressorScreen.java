@@ -4,6 +4,7 @@ import com.mrbysco.thismatters.ThisMatters;
 import com.mrbysco.thismatters.menu.OrganicMatterCompressorMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -33,10 +34,10 @@ public class OrganicMatterCompressorScreen extends AbstractContainerScreen<Organ
 	protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int x, int y) {
 		int i = this.leftPos;
 		int j = this.topPos;
-		guiGraphics.blit(RenderType::guiTextured, SCREEN_LOCATION, i, j, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, SCREEN_LOCATION, i, j, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
 		if (this.menu.hasMatter()) {
 			int l = this.menu.getCompressionProgress();
-			guiGraphics.blit(RenderType::guiTextured, SCREEN_LOCATION, i + 94, j + 36, 176, 0, l + 1, 16, 256, 256);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, SCREEN_LOCATION, i + 94, j + 36, 176, 0, l + 1, 16, 256, 256);
 		}
 
 		guiGraphics.drawCenteredString(this.font, Component.literal(this.menu.getMatterPercentage() + "%"), i + 134, j + 72, 16777215);

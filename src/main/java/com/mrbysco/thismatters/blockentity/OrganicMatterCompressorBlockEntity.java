@@ -1,5 +1,6 @@
 package com.mrbysco.thismatters.blockentity;
 
+import com.mojang.serialization.Codec;
 import com.mrbysco.thismatters.ThisMatters;
 import com.mrbysco.thismatters.config.ThisConfig;
 import com.mrbysco.thismatters.menu.OrganicMatterCompressorMenu;
@@ -8,19 +9,19 @@ import com.mrbysco.thismatters.registry.ThisRecipes;
 import com.mrbysco.thismatters.registry.ThisRegistry;
 import com.mrbysco.thismatters.util.CapabilityHelper;
 import com.mrbysco.thismatters.util.MatterUtil;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -37,11 +38,15 @@ import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
 import java.util.TreeMap;
 
 public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity implements RecipeCraftingHolder {
@@ -105,7 +110,8 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 	protected static final int SLOT_INPUT = 9;
 	protected static final int SLOT_RESULT = 10;
 
-	private final Object2IntOpenHashMap<ResourceLocation> recipesUsed = new Object2IntOpenHashMap<>();
+	private static final Codec<Map<ResourceKey<Recipe<?>>, Integer>> RECIPES_USED_CODEC = Codec.unboundedMap(Recipe.KEY_CODEC, Codec.INT);
+	private final Reference2IntOpenHashMap<ResourceKey<Recipe<?>>> recipesUsed = new Reference2IntOpenHashMap<>();
 	private final RecipeManager.CachedCheck<RecipeInput, CompressingRecipe> quickCheck;
 	private int compressingProgress;
 	private int compressingTotalTime;
@@ -119,38 +125,40 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 	}
 
 	@Override
-	public void loadAdditional(@NotNull CompoundTag tag, @NotNull HolderLookup.Provider registries) {
-		super.loadAdditional(tag, registries);
-		this.matterHandler.deserializeNBT(registries, tag.getCompoundOrEmpty("MatterStackHandler"));
-		this.inputHandler.deserializeNBT(registries, tag.getCompoundOrEmpty("InputStackHandler"));
-		this.resultHandler.deserializeNBT(registries, tag.getCompoundOrEmpty("ResultStackHandler"));
+	public void loadAdditional(ValueInput input) {
+		super.loadAdditional(input);
+		ValueInput matterStackInput = input.childOrEmpty("MatterStackHandler");
+		this.matterHandler.deserialize(matterStackInput);
+		ValueInput inputStackInput = input.childOrEmpty("InputStackHandler");
+		this.inputHandler.deserialize(inputStackInput);
+		ValueInput resultStackInput = input.childOrEmpty("ResultStackHandler");
+		this.resultHandler.deserialize(resultStackInput);
 
-		this.matterAmount = tag.getIntOr("MatterAmount", 0);
-		this.maxMatter = tag.getIntOr("MaxMatter", 0);
-		this.compressingProgress = tag.getIntOr("CompressingTime", 0);
-		this.compressingTotalTime = tag.getIntOr("CompressingTotalTime", 0);
-		CompoundTag compoundtag = tag.getCompoundOrEmpty("RecipesUsed");
+		this.matterAmount = input.getIntOr("MatterAmount", 0);
+		this.maxMatter = input.getIntOr("MaxMatter", 0);
+		this.compressingProgress = input.getIntOr("CompressingTime", 0);
+		this.compressingTotalTime = input.getIntOr("CompressingTotalTime", 0);
 
-		for (String s : compoundtag.keySet()) {
-			this.recipesUsed.put(ResourceLocation.tryParse(s), compoundtag.getIntOr(s, 0));
-		}
+		this.recipesUsed.clear();
+		this.recipesUsed.putAll(input.read("RecipesUsed", RECIPES_USED_CODEC).orElse(Map.of()));
 	}
 
 	@Override
-	protected void saveAdditional(@NotNull CompoundTag tag, @NotNull HolderLookup.Provider registries) {
-		super.saveAdditional(tag, registries);
-		tag.putFloat("MatterAmount", this.matterAmount);
-		tag.putFloat("MaxMatter", this.maxMatter);
-		tag.putInt("CompressingTime", this.compressingProgress);
-		tag.putInt("CompressingTotalTime", this.compressingTotalTime);
+	protected void saveAdditional(ValueOutput output) {
+		super.saveAdditional(output);
+		output.putFloat("MatterAmount", this.matterAmount);
+		output.putFloat("MaxMatter", this.maxMatter);
+		output.putInt("CompressingTime", this.compressingProgress);
+		output.putInt("CompressingTotalTime", this.compressingTotalTime);
 
-		tag.put("MatterStackHandler", matterHandler.serializeNBT(registries));
-		tag.put("InputStackHandler", inputHandler.serializeNBT(registries));
-		tag.put("ResultStackHandler", resultHandler.serializeNBT(registries));
+		ValueOutput matterStackOutput = output.child("MatterStackHandler");
+		matterHandler.serialize(matterStackOutput);
+		ValueOutput inputStackOutput = output.child("InputStackHandler");
+		inputHandler.serialize(inputStackOutput);
+		ValueOutput resultStackOutput = output.child("ResultStackHandler");
+		resultHandler.serialize(resultStackOutput);
 
-		CompoundTag compoundtag = new CompoundTag();
-		this.recipesUsed.forEach((location, index) -> compoundtag.putInt(location.toString(), index));
-		tag.put("RecipesUsed", compoundtag);
+		output.store("RecipesUsed", RECIPES_USED_CODEC, this.recipesUsed);
 	}
 
 	public static void serverTick(Level level, BlockPos pos, BlockState state, OrganicMatterCompressorBlockEntity compressorBlockEntity) {
@@ -277,8 +285,8 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 	@Override
 	public void setRecipeUsed(@Nullable RecipeHolder<?> recipeHolder) {
 		if (recipeHolder != null) {
-			ResourceLocation resourcelocation = recipeHolder.id().location();
-			this.recipesUsed.addTo(resourcelocation, 1);
+			ResourceKey<Recipe<?>> resourcekey = recipeHolder.id();
+			this.recipesUsed.addTo(resourcekey, 1);
 		}
 	}
 
@@ -462,11 +470,6 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 		return ClientboundBlockEntityDataPacket.create(this);
 	}
 
-	@Override
-	public void onDataPacket(@NotNull Connection net, ClientboundBlockEntityDataPacket packet, @NotNull HolderLookup.Provider registries) {
-		this.loadAdditional(packet.getTag(), registries);
-	}
-
 	@NotNull
 	@Override
 	public CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
@@ -474,16 +477,20 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 	}
 
 	@Override
-	public void handleUpdateTag(@NotNull CompoundTag tag, @NotNull HolderLookup.Provider registries) {
-		this.loadAdditional(tag, registries);
+	public void handleUpdateTag(ValueInput input) {
+		super.handleUpdateTag(input);
 	}
 
 	@NotNull
 	@Override
 	public CompoundTag getPersistentData() {
-		CompoundTag nbt = new CompoundTag();
-		this.saveAdditional(nbt, level != null ? level.registryAccess() : VanillaRegistries.createLookup());
-		return nbt;
+		CompoundTag tag = super.getPersistentData();
+		try (ProblemReporter.ScopedCollector problemreporter$scopedcollector = new ProblemReporter.ScopedCollector(ThisMatters.LOGGER)) {
+			TagValueOutput tagvalueoutput = TagValueOutput.createWithContext(problemreporter$scopedcollector, level != null ? level.registryAccess() : VanillaRegistries.createLookup());
+			this.saveAdditional(tagvalueoutput);
+			tag.merge(tagvalueoutput.buildResult());
+		}
+		return tag;
 	}
 
 	public IItemHandler getHandler(@Nullable Direction side) {

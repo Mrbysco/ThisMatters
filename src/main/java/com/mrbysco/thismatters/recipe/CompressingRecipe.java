@@ -46,11 +46,15 @@ public class CompressingRecipe implements Recipe<RecipeInput> {
 
 	@Override
 	public ItemStack assemble(RecipeInput input, HolderLookup.Provider registries) {
-		return this.getResult().copy();
+		return this.getResult();
+	}
+
+	public Ingredient getIngredient() {
+		return this.ingredient;
 	}
 
 	public ItemStack getResult() {
-		return result;
+		return result.copy();
 	}
 
 	public int getCompressingTime() {

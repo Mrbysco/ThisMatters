@@ -20,7 +20,6 @@ import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
@@ -38,6 +37,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
+import net.neoforged.neoforge.common.data.ItemTagsProvider;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import org.jetbrains.annotations.Nullable;
@@ -56,9 +56,8 @@ public class ThisDatagen {
 
 		generator.addProvider(true, new Loots(packOutput, lookupProvider));
 		generator.addProvider(true, new Recipes.Runner(packOutput, lookupProvider));
-		BlockTagsProvider provider;
-		generator.addProvider(true, provider = new ThisBlockTags(packOutput, lookupProvider));
-		generator.addProvider(true, new ThisItemTags(packOutput, lookupProvider, provider));
+		generator.addProvider(true, new ThisBlockTags(packOutput, lookupProvider));
+		generator.addProvider(true, new ThisItemTags(packOutput, lookupProvider));
 
 		generator.addProvider(true, new Language(packOutput));
 		generator.addProvider(true, new Models(packOutput));
@@ -110,7 +109,8 @@ public class ThisDatagen {
 					.requires(Items.DEAD_BRAIN_CORAL).requires(Items.DEAD_BUBBLE_CORAL).requires(Items.DEAD_FIRE_CORAL)
 					.requires(Items.DEAD_HORN_CORAL).requires(Items.DEAD_TUBE_CORAL).requires(Items.DEAD_TUBE_CORAL_FAN)
 					.requires(Items.DEAD_BRAIN_CORAL_FAN).requires(Items.DEAD_BUBBLE_CORAL_FAN).requires(Items.DEAD_FIRE_CORAL_FAN)
-					.requires(Items.DEAD_HORN_CORAL_FAN)
+					.requires(Items.DEAD_HORN_CORAL_FAN).requires(Items.LEAF_LITTER).requires(Items.WILDFLOWERS)
+					.requires(Items.BUSH).requires(Items.FIREFLY_BUSH).requires(Items.CACTUS_FLOWER)
 					.save(output);
 
 			matter(ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "2_matter"), 2)
@@ -132,13 +132,14 @@ public class ThisDatagen {
 					.requires(Items.BRAIN_CORAL_FAN).requires(Items.BUBBLE_CORAL_FAN).requires(Items.FIRE_CORAL_FAN)
 					.requires(Items.HORN_CORAL_FAN).requires(Items.DEAD_TUBE_CORAL_BLOCK).requires(Items.DEAD_BRAIN_CORAL_BLOCK)
 					.requires(Items.DEAD_BUBBLE_CORAL_BLOCK).requires(Items.DEAD_FIRE_CORAL_BLOCK).requires(Items.DEAD_HORN_CORAL_BLOCK)
-					.requires(ItemTags.WOODEN_PRESSURE_PLATES).requires(ItemTags.SAPLINGS)
+					.requires(ItemTags.WOODEN_PRESSURE_PLATES).requires(ItemTags.SAPLINGS).requires(Items.PAINTING)
 					.save(output);
 
 			matter(ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "4_matter"), 4)
 					.requires(ItemTags.PLANKS).requires(Tags.Items.MUSIC_DISCS).requires(Items.TUBE_CORAL_BLOCK)
 					.requires(Items.BRAIN_CORAL_BLOCK).requires(Items.BUBBLE_CORAL_BLOCK)
 					.requires(Items.FIRE_CORAL_BLOCK).requires(Items.HORN_CORAL_BLOCK)
+					.requires(ItemTags.HARNESSES)
 					.save(output);
 
 			matter(ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "5_matter"), 5)
@@ -247,8 +248,8 @@ public class ThisDatagen {
 	}
 
 	public static class ThisItemTags extends ItemTagsProvider {
-		public ThisItemTags(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, BlockTagsProvider blockTagsProvider) {
-			super(output, lookupProvider, blockTagsProvider.contentsGetter(), ThisMatters.MOD_ID);
+		public ThisItemTags(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+			super(output, lookupProvider, ThisMatters.MOD_ID);
 		}
 
 		@Override

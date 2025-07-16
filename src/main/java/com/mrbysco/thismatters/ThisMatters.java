@@ -1,5 +1,6 @@
 package com.mrbysco.thismatters;
 
+import com.mojang.logging.LogUtils;
 import com.mrbysco.thismatters.client.ClientHandler;
 import com.mrbysco.thismatters.config.ThisConfig;
 import com.mrbysco.thismatters.registry.ThisMenus;
@@ -14,13 +15,12 @@ import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 
 @Mod(ThisMatters.MOD_ID)
 public class ThisMatters {
 	public static final String MOD_ID = "thismatters";
-	public static final Logger LOGGER = LogManager.getLogger();
+	public static final Logger LOGGER = LogUtils.getLogger();
 
 	public ThisMatters(IEventBus eventBus, Dist dist, ModContainer container) {
 		container.registerConfig(Type.COMMON, ThisConfig.commonSpec);
@@ -36,15 +36,17 @@ public class ThisMatters {
 		ThisRecipes.RECIPE_SERIALIZERS.register(eventBus);
 		ThisMenus.MENU_TYPES.register(eventBus);
 
+		NeoForge.EVENT_BUS.addListener(this::onDatapackSync);
+
 		if (dist.isClient()) {
 			container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
 			eventBus.addListener(ClientHandler::onRegisterMenu);
 			NeoForge.EVENT_BUS.addListener(ClientHandler::onRecipeReceived);
 			NeoForge.EVENT_BUS.addListener(ClientHandler::onPlayerDisconnect);
-		} else {
-			NeoForge.EVENT_BUS.addListener((OnDatapackSyncEvent event) -> {
-				event.sendRecipes(ThisRecipes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE.get(), ThisRecipes.MATTER_RECIPE_TYPE.get());
-			});
 		}
+	}
+
+	private void onDatapackSync(OnDatapackSyncEvent event) {
+		event.sendRecipes(ThisRecipes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE.get(), ThisRecipes.MATTER_RECIPE_TYPE.get());
 	}
 }

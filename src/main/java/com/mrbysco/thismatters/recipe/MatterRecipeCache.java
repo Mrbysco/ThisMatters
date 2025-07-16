@@ -1,5 +1,6 @@
 package com.mrbysco.thismatters.recipe;
 
+import com.google.common.collect.ImmutableList;
 import com.mrbysco.thismatters.blockentity.OrganicMatterCompressorBlockEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -19,6 +20,14 @@ public class MatterRecipeCache {
 		return compressingRecipes.stream()
 				.filter(recipe -> recipe.value().matches(singleRecipeInput, level))
 				.findFirst();
+	}
+
+	public static List<RecipeHolder<CompressingRecipe>> getCompressingRecipes() {
+		return ImmutableList.copyOf(compressingRecipes);
+	}
+
+	public static List<RecipeHolder<MatterRecipe>> getMatterRecipes() {
+		return ImmutableList.copyOf(matterRecipes);
 	}
 
 	public static int getMatterValue(ItemStack stack, Level level) {
