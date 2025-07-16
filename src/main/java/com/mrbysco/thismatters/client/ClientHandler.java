@@ -20,6 +20,8 @@ public class ClientHandler {
 	}
 
 	public static void onRecipeReceived(final RecipesReceivedEvent event) {
+		MatterRecipeCache.clear();
+
 		Collection<RecipeHolder<CompressingRecipe>> compressingRecipes = event.getRecipeMap().byType(ThisRecipes.ORGANIC_MATTER_COMPRESSION_RECIPE_TYPE.get());
 		MatterRecipeCache.compressingRecipes.addAll(compressingRecipes);
 
