@@ -6,6 +6,7 @@ import com.mrbysco.thismatters.config.ThisConfig;
 import com.mrbysco.thismatters.registry.ThisRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
@@ -38,7 +39,7 @@ public class OrganicMatterCompressorBlock extends BaseEntityBlock {
 
 	@Override
 	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult result) {
-		if (level.isClientSide) {
+		if (level.isClientSide()) {
 			return InteractionResult.SUCCESS;
 		} else {
 			if (level.getBlockEntity(pos) instanceof OrganicMatterCompressorBlockEntity compressorBE) {
@@ -75,7 +76,7 @@ public class OrganicMatterCompressorBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+	protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
 		return AbstractContainerMenu.getRedstoneSignalFromBlockEntity(level.getBlockEntity(pos));
 	}
 
@@ -98,6 +99,6 @@ public class OrganicMatterCompressorBlock extends BaseEntityBlock {
 
 	@Nullable
 	protected static <T extends BlockEntity> BlockEntityTicker<T> createCompressorTicker(Level level, BlockEntityType<T> type, BlockEntityType<? extends OrganicMatterCompressorBlockEntity> compressorType) {
-		return level.isClientSide ? null : createTickerHelper(type, compressorType, OrganicMatterCompressorBlockEntity::serverTick);
+		return level.isClientSide() ? null : createTickerHelper(type, compressorType, OrganicMatterCompressorBlockEntity::serverTick);
 	}
 }

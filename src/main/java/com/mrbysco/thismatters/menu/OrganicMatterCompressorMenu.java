@@ -14,8 +14,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
+import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
+import net.neoforged.neoforge.transfer.item.ResourceHandlerSlot;
 
 import java.util.Objects;
 
@@ -48,18 +48,18 @@ public class OrganicMatterCompressorMenu extends AbstractContainerMenu {
 		this.level = playerInventoryIn.player.level();
 		checkContainerDataCount(data, 4);
 
-		this.addSlot(new SlotItemHandler(blockEntity.getInputInventory(), 0, 126, 17));
-		this.addSlot(new SlotItemHandler(blockEntity.getResultInventory(), 0, 126, 53));
+		this.addSlot(new ResourceHandlerSlot(blockEntity.getInputInventory(), blockEntity.getInputInventory()::set, 0, 126, 17));
+		this.addSlot(new ResourceHandlerSlot(blockEntity.getResultInventory(), blockEntity.getResultInventory()::set, 0, 126, 53));
 
 		this.bindMatterInventory(blockEntity.getMatterInventory());
 
 		this.bindPlayerInventory(playerInventoryIn);
 	}
 
-	private void bindMatterInventory(IItemHandler itemHandler) {
+	private void bindMatterInventory(ItemStacksResourceHandler itemHandler) {
 		for (int row = 0; row < 3; ++row) {
 			for (int col = 0; col < 3; ++col) {
-				this.addSlot(new SlotItemHandler(itemHandler, col + row * 3, 34 + col * 18, 18 + row * 18));
+				this.addSlot(new ResourceHandlerSlot(itemHandler, itemHandler::set, col + row * 3, 34 + col * 18, 18 + row * 18));
 			}
 		}
 	}

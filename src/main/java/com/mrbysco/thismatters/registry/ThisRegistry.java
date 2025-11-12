@@ -46,6 +46,6 @@ public class ThisRegistry {
 			}).build());
 
 	public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ORGANIC_MATTER_COMPRESSOR_BE.get(), OrganicMatterCompressorBlockEntity::getHandler);
+		event.registerBlockEntity(Capabilities.Item.BLOCK, ORGANIC_MATTER_COMPRESSOR_BE.get(), OrganicMatterCompressorBlockEntity::getHandler);
 	}
 }

@@ -148,6 +148,7 @@ public class ThisDatagen {
 
 			matter(ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "8_matter"), 8)
 					.requires(ItemTags.SKULLS)
+					.requires(ItemTags.LOGS)
 					.save(output);
 
 			shaped(RecipeCategory.REDSTONE, ThisRegistry.ORGANIC_MATTER_COMPRESSOR.get())

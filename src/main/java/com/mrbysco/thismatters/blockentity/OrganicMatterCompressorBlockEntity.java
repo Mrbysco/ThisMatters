@@ -7,7 +7,6 @@ import com.mrbysco.thismatters.menu.OrganicMatterCompressorMenu;
 import com.mrbysco.thismatters.recipe.CompressingRecipe;
 import com.mrbysco.thismatters.registry.ThisRecipes;
 import com.mrbysco.thismatters.registry.ThisRegistry;
-import com.mrbysco.thismatters.util.CapabilityHelper;
 import com.mrbysco.thismatters.util.MatterUtil;
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
 import net.minecraft.core.BlockPos;
@@ -41,8 +40,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,32 +53,34 @@ import java.util.TreeMap;
 public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity implements RecipeCraftingHolder {
 	public static final TreeMap<Integer, Integer> cachedValues = new TreeMap<>();
 
-	public final ItemStackHandler matterHandler = new ItemStackHandler(9) {
+	public final ItemStacksResourceHandler matterHandler = new ItemStacksResourceHandler(9) {
 		@Override
-		public boolean isItemValid(int slot, @NotNull ItemStack stack) {
-			if (level != null && !level.isClientSide && level instanceof ServerLevel serverLevel)
-				return getMatterValue(serverLevel, stack) > 0;
+		public boolean isValid(int index, @NotNull ItemResource resource) {
+			if (!resource.isEmpty() && level != null && !level.isClientSide() && level instanceof ServerLevel serverLevel) {
+				int matterValue = getMatterValue(serverLevel, resource.toStack());
+				return matterValue > 0;
+			}
 			return false;
 		}
 	};
-	public final ItemStackHandler inputHandler = new ItemStackHandler(1) {
+	public final ItemStacksResourceHandler inputHandler = new ItemStacksResourceHandler(1) {
 		@Override
-		public boolean isItemValid(int slot, @NotNull ItemStack stack) {
-			return super.isItemValid(slot, stack);
+		public boolean isValid(int index, @NotNull ItemResource resource) {
+			return super.isValid(index, resource);
 		}
 
 		@Override
-		protected void onContentsChanged(int slot) {
-			if (level != null && !level.isClientSide && level instanceof ServerLevel serverLevel) {
-				compressingTotalTime = getTotalCompressingTime(serverLevel, OrganicMatterCompressorBlockEntity.this, new SingleRecipeInput(getStackInSlot(0)));
+		protected void onContentsChanged(int index, ItemStack previousContents) {
+			if (level != null && !level.isClientSide() && level instanceof ServerLevel serverLevel) {
+				compressingTotalTime = getTotalCompressingTime(serverLevel, OrganicMatterCompressorBlockEntity.this, new SingleRecipeInput(getResource(0).toStack()));
 				compressingProgress = 0;
 			}
 			setChanged();
 		}
 	};
-	public final ItemStackHandler resultHandler = new ItemStackHandler(1) {
+	public final ItemStacksResourceHandler resultHandler = new ItemStacksResourceHandler(1) {
 		@Override
-		public boolean isItemValid(int slot, @NotNull ItemStack stack) {
+		public boolean isValid(int index, @NotNull ItemResource resource) {
 			return false;
 		}
 	};
@@ -163,46 +166,55 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 
 	public static void serverTick(Level level, BlockPos pos, BlockState state, OrganicMatterCompressorBlockEntity compressorBlockEntity) {
 		if (level instanceof ServerLevel serverLevel) {
-			for (int i = 0; i < compressorBlockEntity.matterHandler.getSlots(); ++i) {
-				ItemStack itemstack = compressorBlockEntity.matterHandler.getStackInSlot(i);
-				if (!itemstack.isEmpty()) {
-					int matterValue = getMatterValue(serverLevel, itemstack);
-					if (matterValue > 0) {
-						for (int j = 0; j < itemstack.getCount(); ++j) {
-							if (compressorBlockEntity.increaseMatter(matterValue)) {
-								compressorBlockEntity.refreshClient();
-								itemstack.shrink(1);
-							} else {
-								break;
+			try (Transaction tx = Transaction.openRoot()) {
+				boolean canCommit = true;
+				for (int i = 0; i < compressorBlockEntity.matterHandler.size(); ++i) {
+					ItemResource resource = compressorBlockEntity.matterHandler.getResource(i);
+					if (!resource.isEmpty()) {
+						int matterValue = getMatterValue(serverLevel, resource.toStack());
+						if (matterValue > 0) {
+							for (int j = 0; j < compressorBlockEntity.matterHandler.getAmountAsInt(i); ++j) {
+								if (compressorBlockEntity.increaseMatter(matterValue)) {
+									compressorBlockEntity.refreshClient();
+									if (compressorBlockEntity.matterHandler.extract(i, resource, 1, tx) != 1) {
+										canCommit = false;
+										break;
+									}
+								} else {
+									break;
+								}
 							}
 						}
 					}
 				}
-			}
+				if (canCommit) {
+					tx.commit();
 
-			ItemStack inputStack = compressorBlockEntity.inputHandler.getStackInSlot(0);
-			if (compressorBlockEntity.hasMatter() && !inputStack.isEmpty()) {
-				RecipeHolder<CompressingRecipe> recipeHolder = compressorBlockEntity.quickCheck.getRecipeFor(new SingleRecipeInput(inputStack), serverLevel).orElse(null);
-				if (recipeHolder == null) return;
-				CompressingRecipe recipe = recipeHolder.value();
-				int i = compressorBlockEntity.getMaxStackSize();
-				if (compressorBlockEntity.hasMatter() && compressorBlockEntity.canCompress(recipe, i)) {
-					++compressorBlockEntity.compressingProgress;
-					if (compressorBlockEntity.compressingProgress == compressorBlockEntity.compressingTotalTime) {
-						compressorBlockEntity.compressingProgress = 0;
-						compressorBlockEntity.compressingTotalTime = getTotalCompressingTime(serverLevel, compressorBlockEntity, new SingleRecipeInput(inputStack));
-						if (compressorBlockEntity.compress(recipe, i)) {
-							compressorBlockEntity.setRecipeUsed(recipeHolder);
+					ItemResource inputResource = compressorBlockEntity.inputHandler.getResource(0);
+					if (compressorBlockEntity.hasMatter() && !inputResource.isEmpty()) {
+						RecipeHolder<CompressingRecipe> recipeHolder = compressorBlockEntity.quickCheck.getRecipeFor(new SingleRecipeInput(inputResource.toStack()), serverLevel).orElse(null);
+						if (recipeHolder == null) return;
+						CompressingRecipe recipe = recipeHolder.value();
+						int i = compressorBlockEntity.getMaxStackSize();
+						if (compressorBlockEntity.hasMatter() && compressorBlockEntity.canCompress(recipe, i)) {
+							++compressorBlockEntity.compressingProgress;
+							if (compressorBlockEntity.compressingProgress == compressorBlockEntity.compressingTotalTime) {
+								compressorBlockEntity.compressingProgress = 0;
+								compressorBlockEntity.compressingTotalTime = getTotalCompressingTime(serverLevel, compressorBlockEntity, new SingleRecipeInput(inputResource.toStack()));
+								if (compressorBlockEntity.compress(recipe, i)) {
+									compressorBlockEntity.setRecipeUsed(recipeHolder);
+								}
+
+							}
+						} else {
+							compressorBlockEntity.compressingProgress = 0;
 						}
-
+						compressorBlockEntity.refreshClient();
+					} else if (!compressorBlockEntity.hasMatter() && compressorBlockEntity.compressingProgress > 0) {
+						compressorBlockEntity.compressingProgress = Mth.clamp(compressorBlockEntity.compressingProgress - 2, 0, compressorBlockEntity.compressingTotalTime);
+						compressorBlockEntity.refreshClient();
 					}
-				} else {
-					compressorBlockEntity.compressingProgress = 0;
 				}
-				compressorBlockEntity.refreshClient();
-			} else if (!compressorBlockEntity.hasMatter() && compressorBlockEntity.compressingProgress > 0) {
-				compressorBlockEntity.compressingProgress = Mth.clamp(compressorBlockEntity.compressingProgress - 2, 0, compressorBlockEntity.compressingTotalTime);
-				compressorBlockEntity.refreshClient();
 			}
 		}
 	}
@@ -215,20 +227,21 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 	}
 
 	private boolean canCompress(@Nullable Recipe<?> recipe, int count) {
-		if (this.level != null && !inputHandler.getStackInSlot(0).isEmpty() && recipe != null) {
-			ItemStack assembledStack = ((CompressingRecipe) recipe).assemble(new SingleRecipeInput(inputHandler.getStackInSlot(0)), this.level.registryAccess());
+		if (this.level != null && !inputHandler.getResource(0).isEmpty() && recipe != null) {
+			ItemStack assembledStack = ((CompressingRecipe) recipe).assemble(new SingleRecipeInput(inputHandler.getResource(0).toStack()), this.level.registryAccess());
 			if (assembledStack.isEmpty()) {
 				return false;
 			} else {
-				ItemStack resultStack = resultHandler.getStackInSlot(0);
-				if (resultStack.isEmpty()) {
+				ItemResource resultResource = resultHandler.getResource(0);
+				int resultCount = resultHandler.getAmountAsInt(0);
+				if (resultResource.isEmpty()) {
 					return true;
-				} else if (!ItemStack.isSameItem(resultStack, assembledStack)) {
+				} else if (!assembledStack.is(resultResource.getItem())) {
 					return false;
-				} else if (resultStack.getCount() + assembledStack.getCount() <= count && resultStack.getCount() + assembledStack.getCount() <= resultStack.getMaxStackSize()) { // Forge fix: make furnace respect stack sizes in furnace recipes
+				} else if (resultCount + assembledStack.getCount() <= count && resultCount + assembledStack.getCount() <= resultResource.getMaxStackSize()) { // Forge fix: make furnace respect stack sizes in furnace recipes
 					return true;
 				} else {
-					return resultStack.getCount() + assembledStack.getCount() <= assembledStack.getMaxStackSize(); // Forge fix: make furnace respect stack sizes in furnace recipes
+					return resultCount + assembledStack.getCount() <= assembledStack.getMaxStackSize(); // Forge fix: make furnace respect stack sizes in furnace recipes
 				}
 			}
 		} else {
@@ -238,16 +251,24 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 
 	private boolean compress(@Nullable Recipe<?> recipe, int count) {
 		if (this.level != null && recipe != null && this.canCompress(recipe, count)) {
-			ItemStack inputStack = inputHandler.getStackInSlot(0);
-			ItemStack assembledStack = ((CompressingRecipe) recipe).assemble(new SingleRecipeInput(inputHandler.getStackInSlot(0)), this.level.registryAccess());
-			ItemStack resultStack = resultHandler.getStackInSlot(0);
-			if (resultStack.isEmpty()) {
-				resultHandler.setStackInSlot(0, assembledStack.copy());
-			} else if (resultStack.is(assembledStack.getItem())) {
-				resultStack.grow(assembledStack.getCount());
-			}
+			try (Transaction tx = Transaction.openRoot()) {
+				ItemResource inputResource = inputHandler.getResource(0);
+				ItemStack assembledStack = ((CompressingRecipe) recipe).assemble(new SingleRecipeInput(inputResource.toStack()), this.level.registryAccess());
+				ItemResource resultResource = resultHandler.getResource(0);
+				if (resultResource.isEmpty()) {
+					resultHandler.set(0, ItemResource.of(assembledStack), assembledStack.getCount());
+				} else if (resultResource.is(assembledStack.getItem())) {
+					if (resultHandler.insert(resultResource, assembledStack.getCount(), tx) != assembledStack.getCount()) {
+						return false;
+					}
+				}
 
-			inputStack.shrink(1);
+				if (inputHandler.extract(0, inputResource, 1, tx) != 1) {
+					return false;
+				}
+
+				tx.commit();
+			}
 			this.matterAmount = 0;
 			return true;
 		} else {
@@ -314,18 +335,18 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 
 	@Override
 	public boolean isEmpty() {
-		for (int i = 0; i < matterHandler.getSlots(); i++) {
-			if (!matterHandler.getStackInSlot(i).isEmpty()) {
+		for (int i = 0; i < matterHandler.size(); i++) {
+			if (!matterHandler.getResource(i).isEmpty()) {
 				return false;
 			}
 		}
-		for (int i = 0; i < inputHandler.getSlots(); i++) {
-			if (!inputHandler.getStackInSlot(i).isEmpty()) {
+		for (int i = 0; i < inputHandler.size(); i++) {
+			if (!inputHandler.getResource(i).isEmpty()) {
 				return false;
 			}
 		}
-		for (int i = 0; i < resultHandler.getSlots(); i++) {
-			if (!resultHandler.getStackInSlot(i).isEmpty()) {
+		for (int i = 0; i < resultHandler.size(); i++) {
+			if (!resultHandler.getResource(i).isEmpty()) {
 				return false;
 			}
 		}
@@ -336,66 +357,96 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 	@Override
 	public ItemStack getItem(int slot) {
 		if (slot == SLOT_INPUT) {
-			return inputHandler.getStackInSlot(0);
+			return inputHandler.getResource(0).toStack();
 		} else if (slot == SLOT_RESULT) {
-			return resultHandler.getStackInSlot(0);
+			return resultHandler.getResource(0).toStack();
 		} else {
-			return matterHandler.getStackInSlot(slot);
+			return matterHandler.getResource(slot).toStack();
 		}
 	}
 
 	@NotNull
 	@Override
 	public ItemStack removeItem(int slot, int count) {
-		if (slot == SLOT_INPUT) {
-			return CapabilityHelper.removeItem(inputHandler, 0, count);
-		} else if (slot == SLOT_RESULT) {
-			return CapabilityHelper.removeItem(resultHandler, 0, count);
-		} else {
-			return CapabilityHelper.removeItem(matterHandler, slot, count);
+		try (Transaction tx = Transaction.openRoot()) {
+			ItemStack stack = ItemStack.EMPTY;
+			if (slot == SLOT_INPUT) {
+				ItemResource resource = inputHandler.getResource(0);
+				if (inputHandler.extract(0, resource, count, tx) != count) return stack;
+				stack = resource.toStack(count);
+			} else if (slot == SLOT_RESULT) {
+				ItemResource resource = resultHandler.getResource(0);
+				if (resultHandler.extract(0, resource, count, tx) != count) return stack;
+				stack = resource.toStack(count);
+			} else {
+				ItemResource resource = matterHandler.getResource(slot);
+				if (resultHandler.extract(slot, resource, count, tx) != count) return stack;
+				stack = resource.toStack(count);
+			}
+			tx.commit();
+			return stack;
 		}
 	}
 
 	@NotNull
 	@Override
 	public ItemStack removeItemNoUpdate(int slot) {
-		if (slot == SLOT_INPUT) {
-			return CapabilityHelper.takeItem(inputHandler, 0);
-		} else if (slot == SLOT_RESULT) {
-			return CapabilityHelper.takeItem(resultHandler, 0);
-		} else {
-			return CapabilityHelper.takeItem(matterHandler, slot);
+		try (Transaction tx = Transaction.openRoot()) {
+			ItemStack stack = ItemStack.EMPTY;
+			if (slot == SLOT_INPUT) {
+				ItemResource resource = inputHandler.getResource(0);
+				if (resource.isEmpty()) return stack;
+				if (inputHandler.extract(0, resource, 1, tx) != 1) return stack;
+				stack = resource.toStack();
+			} else if (slot == SLOT_RESULT) {
+				ItemResource resource = resultHandler.getResource(0);
+				if (resource.isEmpty()) return stack;
+				if (resultHandler.extract(0, resource, 1, tx) != 1) return stack;
+				stack = resource.toStack();
+			} else {
+				ItemResource resource = matterHandler.getResource(slot);
+				if (resource.isEmpty()) return stack;
+				if (matterHandler.extract(slot, resource, 1, tx) != 1) return stack;
+				stack = resource.toStack();
+			}
+
+			tx.commit();
+			return stack;
 		}
 	}
 
 	@Override
 	public void setItem(int slot, @NotNull ItemStack stack) {
-		ItemStack itemstack;
-		if (slot == SLOT_INPUT) {
-			itemstack = inputHandler.getStackInSlot(0);
-		} else if (slot == SLOT_RESULT) {
-			itemstack = resultHandler.getStackInSlot(0);
-		} else {
-			itemstack = matterHandler.getStackInSlot(slot);
-		}
+		try (Transaction tx = Transaction.openRoot()) {
+			ItemResource resource;
+			if (slot == SLOT_INPUT) {
+				resource = inputHandler.getResource(0);
+			} else if (slot == SLOT_RESULT) {
+				resource = resultHandler.getResource(0);
+			} else {
+				resource = matterHandler.getResource(slot);
+			}
 
-		boolean flag = !stack.isEmpty() && ItemStack.isSameItemSameComponents(stack, itemstack);
-		if (slot == SLOT_INPUT) {
-			inputHandler.setStackInSlot(0, stack);
-		} else if (slot == SLOT_RESULT) {
-			resultHandler.setStackInSlot(0, stack);
-		} else {
-			matterHandler.setStackInSlot(slot, stack);
-		}
-		if (stack.getCount() > this.getMaxStackSize()) {
-			stack.setCount(this.getMaxStackSize());
-		}
+			boolean flag = !stack.isEmpty() && resource.matches(stack);
+			if (slot == SLOT_INPUT) {
+				inputHandler.set(0, ItemResource.of(stack), stack.getCount());
+			} else if (slot == SLOT_RESULT) {
+				resultHandler.set(0, ItemResource.of(stack), stack.getCount());
+			} else {
+				matterHandler.set(slot, ItemResource.of(stack), stack.getCount());
+			}
+			tx.commit();
 
-		if (slot == SLOT_INPUT && !flag) {
-			assert level instanceof ServerLevel;
-			this.compressingTotalTime = getTotalCompressingTime((ServerLevel) level, this, new SingleRecipeInput(this.inputHandler.getStackInSlot(0)));
-			this.compressingProgress = 0;
-			this.setChanged();
+			if (stack.getCount() > this.getMaxStackSize()) {
+				stack.setCount(this.getMaxStackSize());
+			}
+
+			if (slot == SLOT_INPUT && !flag) {
+				assert level instanceof ServerLevel;
+				this.compressingTotalTime = getTotalCompressingTime((ServerLevel) level, this, new SingleRecipeInput(this.inputHandler.getResource(0).toStack()));
+				this.compressingProgress = 0;
+				this.setChanged();
+			}
 		}
 	}
 
@@ -438,26 +489,29 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 
 	@Override
 	public void clearContent() {
-		for (int i = 0; i < matterHandler.getSlots(); i++) {
-			matterHandler.setStackInSlot(i, ItemStack.EMPTY);
-		}
-		for (int i = 0; i < inputHandler.getSlots(); i++) {
-			inputHandler.setStackInSlot(i, ItemStack.EMPTY);
-		}
-		for (int i = 0; i < resultHandler.getSlots(); i++) {
-			resultHandler.setStackInSlot(i, ItemStack.EMPTY);
+		try (Transaction tx = Transaction.openRoot()) {
+			for (int i = 0; i < matterHandler.size(); i++) {
+				matterHandler.set(i, ItemResource.EMPTY, 0);
+			}
+			for (int i = 0; i < inputHandler.size(); i++) {
+				inputHandler.set(i, ItemResource.EMPTY, 0);
+			}
+			for (int i = 0; i < resultHandler.size(); i++) {
+				resultHandler.set(i, ItemResource.EMPTY, 0);
+			}
+			tx.commit();
 		}
 	}
 
-	public IItemHandler getMatterInventory() {
+	public ItemStacksResourceHandler getMatterInventory() {
 		return matterHandler;
 	}
 
-	public IItemHandler getInputInventory() {
+	public ItemStacksResourceHandler getInputInventory() {
 		return inputHandler;
 	}
 
-	public IItemHandler getResultInventory() {
+	public ItemStacksResourceHandler getResultInventory() {
 		return resultHandler;
 	}
 
@@ -493,7 +547,7 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 		return tag;
 	}
 
-	public IItemHandler getHandler(@Nullable Direction side) {
+	public ResourceHandler<ItemResource> getHandler(@Nullable Direction side) {
 		if (side == Direction.UP) {
 			return inputHandler;
 		} else if (side == Direction.DOWN) {
