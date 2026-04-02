@@ -8,7 +8,7 @@
 //import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 //import com.mrbysco.thismatters.recipe.CompressingRecipe;
 //import com.mrbysco.thismatters.registry.ThisRecipes;
-//import net.minecraft.resources.ResourceLocation;
+//import net.minecraft.resources.Identifier;
 //import net.minecraft.world.item.ItemStack;
 //import net.minecraft.world.item.crafting.Ingredient;
 //import net.minecraft.world.item.crafting.RecipeHolder;
@@ -27,7 +27,7 @@
 //
 //	@Method
 //	public void addCompressing(String name, IIngredient ingredient, IItemStack resultStack, int time) {
-//		final ResourceLocation id = ResourceLocation.fromNamespaceAndPath("crafttweaker", name);
+//		final Identifier id = Identifier.fromNamespaceAndPath("crafttweaker", name);
 //		final Ingredient foodIngredient = ingredient.asVanillaIngredient();
 //		final ItemStack resultItemStack = resultStack.getInternal();
 //		final CompressingRecipe recipe = new CompressingRecipe( "", foodIngredient, resultItemStack, time);

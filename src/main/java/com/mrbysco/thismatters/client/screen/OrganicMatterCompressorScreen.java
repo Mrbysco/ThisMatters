@@ -5,13 +5,12 @@ import com.mrbysco.thismatters.menu.OrganicMatterCompressorMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
 public class OrganicMatterCompressorScreen extends AbstractContainerScreen<OrganicMatterCompressorMenu> {
-	private static final ResourceLocation SCREEN_LOCATION = ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "textures/gui/organic_matter_compressor.png");
+	private static final Identifier SCREEN_LOCATION = Identifier.fromNamespaceAndPath(ThisMatters.MOD_ID, "textures/gui/organic_matter_compressor.png");
 
 	public OrganicMatterCompressorScreen(OrganicMatterCompressorMenu menu, Inventory inventory, Component component) {
 		super(menu, inventory, component);

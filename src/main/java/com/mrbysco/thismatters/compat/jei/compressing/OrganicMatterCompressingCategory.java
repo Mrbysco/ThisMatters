@@ -24,11 +24,11 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 public class OrganicMatterCompressingCategory implements IRecipeCategory<CompressingRecipe> {
-	public static final ResourceLocation RECIPE_COMPRESSING_JEI = ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "textures/gui/jei/organic_matter_compressing.png");
+	public static final Identifier RECIPE_COMPRESSING_JEI = Identifier.fromNamespaceAndPath(ThisMatters.MOD_ID, "textures/gui/jei/organic_matter_compressing.png");
 
 	private final IDrawable background;
 	private final IDrawable icon;

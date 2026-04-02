@@ -14,14 +14,14 @@ import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import org.jetbrains.annotations.Nullable;
 
 @JeiPlugin
 public class JeiCompat implements IModPlugin {
-	public static final ResourceLocation PLUGIN_UID = ResourceLocation.fromNamespaceAndPath(ThisMatters.MOD_ID, "main");
+	public static final Identifier PLUGIN_UID = Identifier.fromNamespaceAndPath(ThisMatters.MOD_ID, "main");
 
 	public static final IRecipeType<CompressingRecipe> ORGANIC_MATTER_COMPRESSING_TYPE = IRecipeType.create(
 			ThisMatters.MOD_ID, "organic_matter_compressing", CompressingRecipe.class);
@@ -30,7 +30,7 @@ public class JeiCompat implements IModPlugin {
 	private IRecipeCategory<CompressingRecipe> compressingCategory;
 
 	@Override
-	public ResourceLocation getPluginUid() {
+	public Identifier getPluginUid() {
 		return PLUGIN_UID;
 	}
 
