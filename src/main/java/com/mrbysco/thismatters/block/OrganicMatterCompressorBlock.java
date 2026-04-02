@@ -50,7 +50,7 @@ public class OrganicMatterCompressorBlock extends BaseEntityBlock {
 					if (flag2) {
 						player.openMenu(compressorBE, pos);
 					} else {
-						player.displayClientMessage(Component.translatable("thismatters.organic_matter_compressor.not_low_enough").withStyle(ChatFormatting.RED), true);
+						player.sendOverlayMessage(Component.translatable("thismatters.organic_matter_compressor.not_low_enough").withStyle(ChatFormatting.RED));
 					}
 				}
 			}

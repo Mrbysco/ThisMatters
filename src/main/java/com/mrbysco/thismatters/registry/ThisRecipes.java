@@ -6,6 +6,7 @@ import com.mrbysco.thismatters.recipe.MatterRecipe;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;
@@ -19,6 +20,6 @@ public class ThisRecipes {
 	public static final Supplier<RecipeType<MatterRecipe>> MATTER_RECIPE_TYPE = RECIPE_TYPES.register("matter_recipe", () -> new RecipeType<>() {
 	});
 
-	public static final Supplier<CompressingRecipe.Serializer> ORGANIC_MATTER_COMPRESSION_SERIALIZER = RECIPE_SERIALIZERS.register("organic_matter_compression", CompressingRecipe.Serializer::new);
-	public static final Supplier<MatterRecipe.Serializer> MATTER_SERIALIZER = RECIPE_SERIALIZERS.register("matter_recipe", MatterRecipe.Serializer::new);
+	public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<CompressingRecipe>> ORGANIC_MATTER_COMPRESSION_SERIALIZER = RECIPE_SERIALIZERS.register("organic_matter_compression", () -> CompressingRecipe.SERIALIZER);
+	public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<MatterRecipe>> MATTER_SERIALIZER = RECIPE_SERIALIZERS.register("matter_recipe", () -> MatterRecipe.SERIALIZER);
 }

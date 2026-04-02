@@ -228,7 +228,7 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 
 	private boolean canCompress(@Nullable Recipe<?> recipe, int count) {
 		if (this.level != null && !inputHandler.getResource(0).isEmpty() && recipe != null) {
-			ItemStack assembledStack = ((CompressingRecipe) recipe).assemble(new SingleRecipeInput(inputHandler.getResource(0).toStack()), this.level.registryAccess());
+			ItemStack assembledStack = ((CompressingRecipe) recipe).assemble(new SingleRecipeInput(inputHandler.getResource(0).toStack()));
 			if (assembledStack.isEmpty()) {
 				return false;
 			} else {
@@ -253,7 +253,7 @@ public class OrganicMatterCompressorBlockEntity extends BaseContainerBlockEntity
 		if (this.level != null && recipe != null && this.canCompress(recipe, count)) {
 			try (Transaction tx = Transaction.openRoot()) {
 				ItemResource inputResource = inputHandler.getResource(0);
-				ItemStack assembledStack = ((CompressingRecipe) recipe).assemble(new SingleRecipeInput(inputResource.toStack()), this.level.registryAccess());
+				ItemStack assembledStack = ((CompressingRecipe) recipe).assemble(new SingleRecipeInput(inputResource.toStack()));
 				ItemResource resultResource = resultHandler.getResource(0);
 				if (resultResource.isEmpty()) {
 					resultHandler.set(0, ItemResource.of(assembledStack), assembledStack.getCount());

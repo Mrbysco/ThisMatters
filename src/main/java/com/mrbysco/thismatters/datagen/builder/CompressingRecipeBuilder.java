@@ -10,7 +10,7 @@ import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
@@ -47,8 +47,9 @@ public class CompressingRecipeBuilder implements RecipeBuilder {
 		return this;
 	}
 
-	public Item getResult() {
-		return this.result;
+	@Override
+	public ResourceKey<Recipe<?>> defaultId() {
+		return RecipeBuilder.getDefaultRecipeId(new ItemStackTemplate(this.result));
 	}
 
 	public void save(RecipeOutput recipeOutput, ResourceKey<Recipe<?>> recipeResourceKey) {
@@ -58,7 +59,7 @@ public class CompressingRecipeBuilder implements RecipeBuilder {
 				.rewards(AdvancementRewards.Builder.recipe(recipeResourceKey))
 				.requirements(AdvancementRequirements.Strategy.OR);
 		this.criteria.forEach(requirements::addCriterion);
-		CompressingRecipe recipe = new CompressingRecipe(this.group == null ? "" : this.group, this.ingredient, new ItemStack(result), this.compressingTime);
+		CompressingRecipe recipe = new CompressingRecipe(this.group == null ? "" : this.group, this.ingredient, new ItemStackTemplate(result), this.compressingTime);
 		recipeOutput.accept(recipeResourceKey, recipe, requirements.build(recipeResourceKey.identifier().withPrefix("recipes/misc/")));
 	}
 

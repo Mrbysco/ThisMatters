@@ -2,7 +2,7 @@ package com.mrbysco.thismatters.client.screen;
 
 import com.mrbysco.thismatters.ThisMatters;
 import com.mrbysco.thismatters.menu.OrganicMatterCompressorMenu;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -24,21 +24,21 @@ public class OrganicMatterCompressorScreen extends AbstractContainerScreen<Organ
 	}
 
 	@Override
-	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-		super.render(guiGraphics, mouseX, mouseY, partialTicks);
-		this.renderTooltip(guiGraphics, mouseX, mouseY);
+	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+		super.extractRenderState(graphics, mouseX, mouseY, partialTicks);
+		this.extractTooltip(graphics, mouseX, mouseY);
 	}
 
 	@Override
-	protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int x, int y) {
+	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
 		int i = this.leftPos;
 		int j = this.topPos;
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, SCREEN_LOCATION, i, j, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
+		graphics.blit(RenderPipelines.GUI_TEXTURED, SCREEN_LOCATION, i, j, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
 		if (this.menu.hasMatter()) {
 			int l = this.menu.getCompressionProgress();
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, SCREEN_LOCATION, i + 94, j + 36, 176, 0, l + 1, 16, 256, 256);
+			graphics.blit(RenderPipelines.GUI_TEXTURED, SCREEN_LOCATION, i + 94, j + 36, 176, 0, l + 1, 16, 256, 256);
 		}
 
-		guiGraphics.drawCenteredString(this.font, Component.literal(this.menu.getMatterPercentage() + "%"), i + 134, j + 72, 16777215);
+		graphics.centeredText(this.font, Component.literal(this.menu.getMatterPercentage() + "%"), i + 134, j + 72, 16777215);
 	}
 }

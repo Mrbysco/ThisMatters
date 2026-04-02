@@ -21,7 +21,7 @@ import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
@@ -86,11 +86,11 @@ public class OrganicMatterCompressingCategory implements IRecipeCategory<Compres
 	}
 
 	@Override
-	public void draw(CompressingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+	public void draw(CompressingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
 		this.background.draw(guiGraphics, 0, 0);
 		Font font = Minecraft.getInstance().font;
 		MutableComponent component = Component.literal((int) (recipe.getCompressingTime() / 20f) + "s");
-		guiGraphics.drawString(font, component, 76 - font.width(component) / 2, 50, 16777215, false);
+		guiGraphics.text(font, component, 76 - font.width(component) / 2, 50, 16777215, false);
 	}
 
 	public static class MatterTooltip implements IRecipeSlotRichTooltipCallback {

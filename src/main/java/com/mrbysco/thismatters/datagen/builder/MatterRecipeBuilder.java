@@ -11,7 +11,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
@@ -68,14 +67,14 @@ public class MatterRecipeBuilder implements RecipeBuilder {
 		return null;
 	}
 
-	@Override
-	public Item getResult() {
-		return Items.AIR;
-	}
-
 	public MatterRecipeBuilder group(@Nullable String group) {
 		this.group = group;
 		return this;
+	}
+
+	@Override
+	public ResourceKey<Recipe<?>> defaultId() {
+		return ResourceKey.create(Registries.RECIPE, name);
 	}
 
 	public void save(RecipeOutput recipeOutput, ResourceKey<Recipe<?>> recipeResourceKey) {

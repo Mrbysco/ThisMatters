@@ -4,10 +4,11 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.mrbysco.thismatters.registry.ThisRecipes;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.PlacementInfo;
 import net.minecraft.world.item.crafting.Recipe;
@@ -20,14 +21,37 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 public class CompressingRecipe implements Recipe<RecipeInput> {
+	public static final MapCodec<CompressingRecipe> CODEC = RecordCodecBuilder.mapCodec(
+			instance -> instance.group(
+							Codec.STRING.optionalFieldOf("group", "").forGetter(recipe -> recipe.group),
+							Ingredient.CODEC.fieldOf("ingredient").forGetter(recipe -> recipe.ingredient),
+							ItemStackTemplate.CODEC.fieldOf("result").forGetter(recipe -> recipe.result),
+							Codec.INT.optionalFieldOf("compressingtime", 900).forGetter(recipe -> recipe.compressingTime)
+					)
+					.apply(instance, CompressingRecipe::new)
+	);
+	public static final StreamCodec<RegistryFriendlyByteBuf, CompressingRecipe> STREAM_CODEC = StreamCodec.composite(
+			ByteBufCodecs.STRING_UTF8,
+			o -> o.group,
+			Ingredient.CONTENTS_STREAM_CODEC,
+			o -> o.ingredient,
+			ItemStackTemplate.STREAM_CODEC,
+			o -> o.result,
+			ByteBufCodecs.INT,
+			o -> o.compressingTime,
+			CompressingRecipe::new
+	);
+	public static final RecipeSerializer<CompressingRecipe> SERIALIZER = new RecipeSerializer<>(CODEC, STREAM_CODEC);
+
+
 	protected final String group;
 	protected final Ingredient ingredient;
-	protected final ItemStack result;
+	protected final ItemStackTemplate result;
 	protected final int compressingTime;
 	@Nullable
 	private PlacementInfo placementInfo;
 
-	public CompressingRecipe(String group, Ingredient ingredient, ItemStack resultStack, int compressingTime) {
+	public CompressingRecipe(String group, Ingredient ingredient, ItemStackTemplate resultStack, int compressingTime) {
 		this.group = group;
 		this.ingredient = ingredient;
 		this.result = resultStack;
@@ -45,7 +69,7 @@ public class CompressingRecipe implements Recipe<RecipeInput> {
 	}
 
 	@Override
-	public ItemStack assemble(RecipeInput input, HolderLookup.Provider registries) {
+	public ItemStack assemble(RecipeInput input) {
 		return this.getResult();
 	}
 
@@ -54,7 +78,7 @@ public class CompressingRecipe implements Recipe<RecipeInput> {
 	}
 
 	public ItemStack getResult() {
-		return result.copy();
+		return result.create();
 	}
 
 	public int getCompressingTime() {
@@ -90,43 +114,8 @@ public class CompressingRecipe implements Recipe<RecipeInput> {
 		return true;
 	}
 
-	public static class Serializer implements RecipeSerializer<CompressingRecipe> {
-		public static final MapCodec<CompressingRecipe> CODEC = RecordCodecBuilder.mapCodec(
-				instance -> instance.group(
-								Codec.STRING.optionalFieldOf("group", "").forGetter(recipe -> recipe.group),
-								Ingredient.CODEC.fieldOf("ingredient").forGetter(recipe -> recipe.ingredient),
-								ItemStack.STRICT_SINGLE_ITEM_CODEC.fieldOf("result").forGetter(recipe -> recipe.result),
-								Codec.INT.optionalFieldOf("compressingtime", 900).forGetter(recipe -> recipe.compressingTime)
-						)
-						.apply(instance, CompressingRecipe::new)
-		);
-		public static final StreamCodec<RegistryFriendlyByteBuf, CompressingRecipe> STREAM_CODEC = StreamCodec.of(
-				CompressingRecipe.Serializer::toNetwork, CompressingRecipe.Serializer::fromNetwork
-		);
-
-		@Override
-		public MapCodec<CompressingRecipe> codec() {
-			return CODEC;
-		}
-
-		@Override
-		public StreamCodec<RegistryFriendlyByteBuf, CompressingRecipe> streamCodec() {
-			return STREAM_CODEC;
-		}
-
-		public static CompressingRecipe fromNetwork(RegistryFriendlyByteBuf buffer) {
-			String s = buffer.readUtf();
-			Ingredient ingredient = Ingredient.CONTENTS_STREAM_CODEC.decode(buffer);
-			ItemStack itemstack = ItemStack.STREAM_CODEC.decode(buffer);
-			int compressingTime = buffer.readVarInt();
-			return new CompressingRecipe(s, ingredient, itemstack, compressingTime);
-		}
-
-		public static void toNetwork(RegistryFriendlyByteBuf buffer, CompressingRecipe recipe) {
-			buffer.writeUtf(recipe.group);
-			Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.ingredient);
-			ItemStack.STREAM_CODEC.encode(buffer, recipe.result);
-			buffer.writeVarInt(recipe.compressingTime);
-		}
+	@Override
+	public boolean showNotification() {
+		return false;
 	}
 }

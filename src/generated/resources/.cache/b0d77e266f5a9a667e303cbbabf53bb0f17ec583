@@ -1,4 +1,4 @@
-// 1.21.11	2026-04-03T00:08:37.5316603	ThisMatters Recipes
+// 26.1.1	2026-04-03T00:25:08.1584848	ThisMatters Recipes
 308e47fe529156545d534018d9b9f5ca9bed09b1 data/thismatters/advancement/recipes/misc/coal_block_from_compressing_coal.json
 eb545fa8c6083eda92835349ea8239a57c830e19 data/thismatters/advancement/recipes/redstone/organic_matter_compressor.json
 90207b8dbf4e3744dce0d9ef1be79ea75d7fd564 data/thismatters/recipe/1_matter.json
@@ -7,4 +7,4 @@ eb545fa8c6083eda92835349ea8239a57c830e19 data/thismatters/advancement/recipes/re
 6321e7a722c38af8b92259130256abba2f318036 data/thismatters/recipe/5_matter.json
 3ec2f22b4a31632ab1d690b62a50c68e6a92b648 data/thismatters/recipe/8_matter.json
 8d18fbe70132a4ddf31520e7a544394a842755f1 data/thismatters/recipe/coal_block_from_compressing_coal.json
-5847e8c32da3d4d62bfa8efde9cb82805951fe94 data/thismatters/recipe/organic_matter_compressor.json
+fac606138a15d1d39a58aefc7344770b8dde50fc data/thismatters/recipe/organic_matter_compressor.json
